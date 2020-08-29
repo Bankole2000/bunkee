@@ -1,0 +1,160 @@
+-----------------------------
+SECTION: Project Overview 
+-----------------------------
+  Bunkee is an app that helps 4 kinds of people 
+  1. people who want to make money by hosting others in spare rooms or cohabitable living spaces
+  2. people who want are looking for a place to stay for a short while 
+  3. people who are looking for a place to rent and want to share the costs by cohabiting 
+  4. Real estate agents and landlords who are looking for prospective tenants
+
+-----------------------------
+SECTION: User roles
+-----------------------------
+  Naturally, the above description gives rise to 4 major user roles 
+  1. Host (offering shared/solo living space)
+  2. Seeker (searching for a living space)
+  3. Potential Co-renter (searching for a cohabitor)
+  4. Real Estate Agents & landlords (offering rentable space)
+  NOTE: supplementary users - necessary for the running of the app 
+    - app admin 
+    - tech support
+
+-----------------------------
+SECTION: user stories
+-----------------------------
+  1. User Host signs up -
+    Once and only when logged in can user 
+    - post a listing for a spare room or cohabitable space 
+      Said listing will include such details as
+        - location { address, town, city, and state }
+        - bookable periods { 1 night, a weekend, a week, 2 weeks, 4 weeks (a month), 2 months, 3 months, and 6 months (max) }
+        - relative price for each bookable period 
+        - Short Description (required)
+        - Long description (optional)
+        - Amenities { water, power etc}
+        - Rules { curfews, smoking, pets, infants etc }
+        - geographical location (google maps?)
+        - Any other details
+    - once a listing has been sufficiently detailed, the host can 
+      (1) Save for editing later 
+      (2) Save and publish listing 
+      (3) unpublish listing
+      (4) edit/update listing
+      (5) delete listing 
+    - After posting/published listing, host can 
+      Invite seekers and co-renters to view listing or to chat
+      - Invite to view notifies invitee via email & is stored in app inbox
+      - Invite to chat notivies invitee via email & is stored in app chat   
+    NOTE: rooms can only be booked when they are available and published
+    non-published listings will not appear in searches
+    - non-booking users can like/favorite, and share above posted listing, 
+    - users who have booked a listing can perform the above actions as well as 
+    rate, and review/comment on and recommend / not recommend posted listing
+    NOTE: Booking request must be approved by host to be finalized.
+      i.e. Booking must be confirmed by host to be registered as successful booking.
+  
+  2. User seeker signs up -
+    - [guest] Is shown a list of featured listings (using current location) 
+    - [guest] can search for listing in a particular area (by state or city)
+    - [guest] can filter search results by price, amenities, rules, bookable period, or any other variable
+    - [logged in] can like/favorite, share listings 
+    - [logged in] can book published listings (payment options?)
+    - [logged in and has booked] can rate/review/recommend listing and/or listing publisher/host. 
+    - [guest] can view listing details
+    - [guest] can view host profile details
+    - [logged in] can chat with host, other users
+  
+  3. User Co-renter signs up - 
+    - [guest] is shown a list of featured co-renter listings (using current location)
+    - [guest] can search for people willing to co-rent by location 
+    - [guest] users can filter search results by price, gender, budget, etc
+    - [guest] user can view details of co-rent offers and profiles of co-renter offerer
+    - [logged in] user can Invite other users to chat
+    - [logged in] user can choose to "match" listing if co-rent 
+      Matching co-rent listing notifies poster via email
+    - [logged in] user can post intent to rent or co-habit
+      - Intent to rent or co-habit post must contain the following details 
+        - preferred location
+        - willing to co-habit or rent solo
+        - budget
+        - preferred type of place (self-con, 1 room, 2 bedroom, )  
+        - preferred amenities 
+        - preferred rules 
+        - short public bio
+        - any special needs? (e.g. allergies, is parent).
+  4. Real Estate Agent signs in 
+    - [logged in] Applies for Real estate agent/landlord role
+    - [Approved REA] Can CRUD and publish RE Listing 
+    - [Approved REA] Can invite users to view RE Listing 
+    - [Approved REA] Can invite users to chat 
+
+---------------------------------
+SECTION: App Overview / Layout  
+---------------------------------
+  Profile
+    - Account details - View, edit/update, change password
+      - First name, last name, email, phone, bio, profile pic 
+    - View Bookings - Requested and/or approved.
+    - View/edit self-posted listings, 
+    - View liked/Favorite listings, 
+    - View/edit self-posted rent/co-rent offers
+    - View liked/Favorited rent/co-rent offers
+    - [Real Estate Agent - REA] View/edit self-posted RE listings, 
+    - View liked/Favorite RE listings
+  Find a place
+    - Temporary { for shared/solo short-term living spaces}
+    - Long-term { for Real Estate Listings }
+  Host a guest
+    - Create a hosting offer 
+    - View Hosting Offers created and Details 
+  Messages
+    - Chat - full page  
+    - Invitations
+    - Inquiries sent. 
+  Real Estate Agency
+    - Apply as a Real Estate Agent / Landlord 
+      - Application must include Certificate from aean.ng or reputable institution
+      - [ if Landlord ] Application must include copy of C/O.
+      - Application must be approved to obtain [Approved REA] role  
+    - [ Approved REA ] Create and publish RE Listing Offer 
+    - [ Approved REA ] View Created RE listings, 
+      - View Details of single RE listing including 
+        - Those who liked, Comments, Reviews, Rating etc...
+  Support 
+    - Contact admin - raise support ticket
+    - View support tickets. 
+
+---------------------------------
+SECTION: App Admin / Support 
+---------------------------------
+  Admin route should cover 
+  - Analytics
+    - Track metrics, traffic, Server health/status, generate reports etc.   
+  - CRUD users, solo/shared listings, co-rent intent listings, RE Listings
+  - Approve REA Applications
+  - Handle Support tickets
+  - Create Broadcast Messages 
+
+---------------------------------
+SECTION: Database Overview
+---------------------------------
+  App will use REST & Sockets
+  - Entities
+      USER Entity
+      HOST Entity
+      HOST_OFFER 
+      CORENT_OFFER Entity 
+      REALESTATE_OFFER Entity  
+  - Relationships
+      USER can be HOST [1-1]
+      USER can be REA [1-1]
+      USER has HOST_OFFER [1-N]
+      USER has CORENT_OFFER [1-N]
+      USER has REALESTATE_OFFER [1-N]
+  { to be continued }
+
+---------------------------------
+SECTION: Site Map (pages & routes)
+---------------------------------
+  { to be continued }
+
