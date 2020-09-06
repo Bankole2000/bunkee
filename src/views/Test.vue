@@ -15,11 +15,7 @@
       :permanent="drawerRight"
     >
       <v-toolbar absolute style="width: 100%;">
-        <v-btn
-          icon
-          class="hidden-xs-only"
-          @click.stop="drawerRight = !drawerRight"
-        >
+        <v-btn icon @click.stop="drawerRight = !drawerRight">
           <v-icon>mdi-arrow-left</v-icon>
         </v-btn>
 
@@ -36,7 +32,6 @@
         <v-spacer></v-spacer>
         <v-btn
           icon
-          class="hidden-xs-only"
           :color="isSearchingChat ? 'primary' : 'secondary'"
           @click="isSearchingChat = !isSearchingChat"
         >
@@ -99,21 +94,28 @@
       </div>
     </v-navigation-drawer>
 
-    <v-app-bar elevate-on-scroll app clipped-right color="blue-grey" dark>
+    <v-app-bar
+      elevate-on-scroll
+      app
+      clipped-right
+      color="grey"
+      style="background-image: linear-gradient( to right, rgba(255,10,25,.43), rgba(25,10,255,.7));"
+      dark
+    >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>Toolbar</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-app-bar-nav-icon
         @click.stop="drawerRight = !drawerRight"
       ></v-app-bar-nav-icon>
-      <v-btn text icon @click.stop="drawerRight = !drawerRight">
+      <v-btn text icon class="mr-4" @click.stop="drawerRight = !drawerRight">
         <v-badge content="3" value="3" color="primary" overlap>
           <v-icon>mdi-forum</v-icon>
         </v-badge></v-btn
       >
     </v-app-bar>
     <v-app-bar
-      clipped-right
+      clipped
       app
       color="#fcb69f"
       dark
@@ -121,16 +123,89 @@
       shrink-on-scroll
       elevation="0"
       style="z-index: 0;"
-      class="mt-14"
+      class="mt-14 d-flex justify-center"
       src="https://picsum.photos/1920/1080?random"
-      ><v-toolbar-title>Page Title</v-toolbar-title>
+      ><v-toolbar-title :class="{ 'float-left': drawerRight }"
+        >Page Title</v-toolbar-title
+      >
       <template v-slot:img="{ props }">
         <v-img
           v-bind="props"
-          gradient="to top right, rgba(19,84,122,.5), rgba(128,208,199,.8)"
+          gradient="to right, rgba(255,10,25,.33), rgba(25,10,255,.7)"
         ></v-img>
       </template>
     </v-app-bar>
+    <v-card
+      :class="{ 'mx-4': drawerRight, 'mt-n2': true, 'mx-auto': !drawerRight }"
+      :min-width="
+        drawerRight
+          ? $vuetify.breakpoint.width / 2
+          : $vuetify.breakpoint.width / 1.3
+      "
+      :max-width="$vuetify.breakpoint.width / 1.2"
+    >
+      <v-toolbar flat>
+        <!-- <v-toolbar-title class="grey--text">Title</v-toolbar-title> -->
+        <v-text-field
+          class="mt-7"
+          rounded
+          solo
+          autofocus
+          name="placeSearch"
+          label="Search by Location, City, or State"
+          id="test"
+        ></v-text-field>
+        <!-- <v-spacer></v-spacer> -->
+
+        <v-btn icon>
+          <v-icon>mdi-magnify</v-icon>
+        </v-btn>
+
+        <v-btn icon>
+          <v-icon>mdi-filter-variant</v-icon>
+        </v-btn>
+
+        <v-btn icon>
+          <v-icon>mdi-dots-vertical</v-icon>
+        </v-btn>
+      </v-toolbar>
+
+      <v-divider></v-divider>
+      <v-slide-group v-model="model" class="pa-4" center-active show-arrows>
+        <v-slide-item
+          v-for="n in 15"
+          :key="n"
+          v-slot:default="{ active, toggle }"
+        >
+          <v-card
+            :color="active ? 'primary' : 'grey lighten-1'"
+            class="ma-4"
+            height="200"
+            width="100"
+            @click="toggle"
+          >
+            <v-row class="fill-height" align="center" justify="center">
+              <v-scale-transition>
+                <v-icon
+                  v-if="active"
+                  color="white"
+                  size="48"
+                  v-text="'mdi-close-circle-outline'"
+                ></v-icon>
+              </v-scale-transition>
+            </v-row>
+          </v-card>
+        </v-slide-item>
+      </v-slide-group>
+
+      <v-expand-transition>
+        <v-sheet v-if="model != null" color="grey lighten-4" height="200" tile>
+          <v-row class="fill-height" align="center" justify="center">
+            <h3 class="title">Selected {{ model }}</h3>
+          </v-row>
+        </v-sheet>
+      </v-expand-transition>
+    </v-card>
 
     <v-navigation-drawer v-model="drawer" app>
       <v-list dense>
@@ -174,7 +249,7 @@
 
     <v-navigation-drawer v-model="left" fixed temporary></v-navigation-drawer>
 
-    <v-main>
+    <!-- <v-main>
       <v-container class="fill-height" style="height: 200vw;" fluid>
         <v-row justify="center" align="center">
           <v-col class="shrink">
@@ -189,7 +264,7 @@
           </v-col>
         </v-row>
       </v-container>
-    </v-main>
+    </v-main> -->
 
     <v-navigation-drawer
       v-model="right"
@@ -274,8 +349,8 @@
           height="292px"
           dark
         >
-          <v-row class="fill-height">
-            <v-card-title class="pt-0">
+          <v-row class="fill-height pt-0">
+            <v-card-title class="pt-0 mt-n0">
               <v-btn dark large icon @click.stop="farRight = !farRight">
                 <v-icon>mdi-chevron-left</v-icon>
               </v-btn>
@@ -293,8 +368,8 @@
 
             <v-spacer></v-spacer>
 
-            <v-card-title class="white--text pl-12 pt-12">
-              <div class="display-1 pl-12 pt-12">Ali Conners</div>
+            <v-card-title class="white--text pl-12 pt-16">
+              <div class="display-1 pl-12 pt-16">Ali Conners</div>
             </v-card-title>
           </v-row>
         </v-img>
@@ -366,7 +441,13 @@
       </v-card>
     </v-navigation-drawer>
 
-    <v-footer app color="blue-grey" class="white--text">
+    <v-footer
+      inset
+      app
+      style="background-image: linear-gradient( to right, rgba(255,10,25,.43), rgba(25,10,255,.7));"
+      color="blue-grey"
+      class="white--text"
+    >
       <span>Vuetify</span>
       <v-spacer></v-spacer>
       <span>&copy; {{ new Date().getFullYear() }}</span>
@@ -393,6 +474,7 @@ export default {
   data: () => ({
     isSearchingChat: false,
     chatSearch: '',
+    model: null,
     drawer: null,
     drawerRight: true,
     right: false,
