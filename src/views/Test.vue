@@ -24,7 +24,7 @@
         </v-btn>
 
         <!-- <v-toolbar-title>Title</v-toolbar-title> -->
-        <v-slide-x-reverse-transition mode="out-in">
+        <v-slide-x-reverse-transition duration="1" mode="out-in">
           <v-text-field
             v-if="isSearchingChat"
             hide-details
