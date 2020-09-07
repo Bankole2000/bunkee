@@ -97,7 +97,7 @@
     <v-app-bar
       elevate-on-scroll
       app
-      clipped-right
+      clipped
       color="grey"
       style="background-image: linear-gradient( to right, rgba(255,10,25,.43), rgba(25,10,255,.7));"
       dark
@@ -136,13 +136,17 @@
       </template>
     </v-app-bar>
     <v-card
-      :class="{ 'mx-4': drawerRight, 'mt-n2': true, 'mx-auto': !drawerRight }"
+      :class="{
+        'mx-4': $vuetify.breakpoint.width > 450,
+        'mt-n2': true,
+        'mx-0': $vuetify.breakpoint.width < 450
+      }"
       :min-width="
         drawerRight
           ? $vuetify.breakpoint.width / 2
           : $vuetify.breakpoint.width / 1.3
       "
-      :max-width="$vuetify.breakpoint.width / 1.2"
+      :max-width="$vuetify.breakpoint.width"
     >
       <v-toolbar flat>
         <!-- <v-toolbar-title class="grey--text">Title</v-toolbar-title> -->
@@ -171,19 +175,101 @@
       </v-toolbar>
 
       <v-divider></v-divider>
-      <v-slide-group v-model="model" class="pa-4" center-active show-arrows>
+      <v-slide-group
+        v-model="model"
+        class="py-4 px-0"
+        center-active
+        show-arrows
+      >
         <v-slide-item
           v-for="n in 15"
           :key="n"
           v-slot:default="{ active, toggle }"
         >
-          <v-card
+          <v-hover>
+            <template v-slot:default="{ hover }">
+              <v-card
+                @click="toggle"
+                :elevation="active ? '4' : '2'"
+                class="ma-4"
+                :style="active ? 'scale: 1.05' : 'scale: 1'"
+                max-width="300"
+              >
+                <v-img
+                  class="white--text align-end"
+                  height="200px"
+                  gradient="to top, #00000033, #00000000"
+                  src="https://cdn.vuetifyjs.com/images/cards/docks.jpg"
+                >
+                  <v-card-title>Top 10 Australian beaches</v-card-title>
+                </v-img>
+                <v-list-item class="pl-0">
+                  <v-badge
+                    bordered
+                    bottom
+                    dot
+                    offset-x="25"
+                    offset-y="20"
+                    color="green accent-4"
+                  >
+                    <v-list-item-avatar>
+                      <v-img
+                        src="https://cdn.vuetifyjs.com/images/lists/1.jpg"
+                        gradient="to top, #00000033, #00000000"
+                      ></v-img>
+                    </v-list-item-avatar>
+                  </v-badge>
+
+                  <v-list-item-content>
+                    <v-list-item-title>@username123</v-list-item-title>
+                    <v-list-item-subtitle
+                      ><v-rating small :value="0" dense></v-rating
+                    ></v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-card-subtitle class="py-0">Number 10</v-card-subtitle>
+
+                <v-card-text class="text--primary">
+                  <div>Whitehaven Beach</div>
+
+                  <div>Whitsunday Island, Whitsunday Islands</div>
+                </v-card-text>
+
+                <v-card-actions class="pa-0">
+                  <v-card-title class="pt-0">
+                    <v-rating
+                      :value="4"
+                      dense
+                      color="orange"
+                      background-color="orange"
+                      hover
+                      class="mr-2"
+                    ></v-rating>
+                    <span class="mt-2 float-right"
+                      ><span class="font-weight-black">&#8358;5k </span>
+                      <span class="font-weight-light">/ night</span></span
+                    >
+                  </v-card-title>
+                </v-card-actions>
+                <v-fade-transition>
+                  <v-overlay
+                    v-if="hover"
+                    :opacity="0.05"
+                    absolute
+                    color="#036358EE"
+                  >
+                    <v-btn @click="active = true">See more info</v-btn>
+                  </v-overlay>
+                </v-fade-transition>
+              </v-card>
+            </template>
+          </v-hover>
+          <!-- <v-card
             :color="active ? 'primary' : 'grey lighten-1'"
             class="ma-4"
-            height="200"
-            width="100"
-            @click="toggle"
-          >
+            height="270"
+            width="180"
+            @click="toggle">
             <v-row class="fill-height" align="center" justify="center">
               <v-scale-transition>
                 <v-icon
@@ -194,12 +280,12 @@
                 ></v-icon>
               </v-scale-transition>
             </v-row>
-          </v-card>
+          </v-card> -->
         </v-slide-item>
       </v-slide-group>
 
       <v-expand-transition>
-        <v-sheet v-if="model != null" color="grey lighten-4" height="200" tile>
+        <v-sheet v-if="model != null" color="grey lighten-4" height="300" tile>
           <v-row class="fill-height" align="center" justify="center">
             <h3 class="title">Selected {{ model }}</h3>
           </v-row>
@@ -448,7 +534,7 @@
       color="blue-grey"
       class="white--text"
     >
-      <span>Vuetify</span>
+      <span>App Name</span>
       <v-spacer></v-spacer>
       <span>&copy; {{ new Date().getFullYear() }}</span>
     </v-footer>
@@ -474,12 +560,22 @@ export default {
   data: () => ({
     isSearchingChat: false,
     chatSearch: '',
-    model: null,
+    model: 0,
     drawer: null,
     drawerRight: true,
     right: false,
     left: false,
     farRight: false,
+    cards: [
+      {
+        image: 'https://picsum.photos/1920/1080?random',
+        title: 'Cool stay place',
+        shortDesc: '',
+        userAvatar: '',
+        userUsername: '',
+        placeRating: ''
+      }
+    ],
     items: [
       { header: 'Today', title: 'test', divider: true, inset: false },
       {

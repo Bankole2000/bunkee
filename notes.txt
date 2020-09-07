@@ -158,3 +158,11 @@ SECTION: Site Map (pages & routes)
 ---------------------------------
   { to be continued }
 
+
+
+
+SECTION: Ideas 
+
+- Services to help with moving 
+- Community tab - similar to social network people can post random stuff 
+  - community stories
