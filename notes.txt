@@ -166,3 +166,25 @@ SECTION: Ideas
 - Services to help with moving 
 - Community tab - similar to social network people can post random stuff 
   - community stories
+- Group chat
+- Notifications - Notification types 
+  - Invite to chat 
+  - Invite to view Listing 
+  - Invite to view property 
+  - Messages from admin
+    - Account suspension 
+    - Response to Support tickets 
+    - General messages 
+  - Welcome messages e.g. getting started 
+    - On First Signup  
+  - View Notification History
+    - Timeline of notifications 
+    - Timeline of Activities
+
+
+Each link has five different states: link, hover, active, focus and visited.
+
+Link is the normal appearance, hover is when you mouse over, active is the state when it's clicked, focus follows active and visited is the state you end up when you unfocus the recently clicked link.
+
+
+<span class="grey--text text--lighten-1">4</span>

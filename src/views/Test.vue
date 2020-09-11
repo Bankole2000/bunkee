@@ -13,6 +13,7 @@
       app
       right
       :permanent="drawerRight"
+      :temporary="$vuetify.breakpoint.smAndDown"
     >
       <v-toolbar absolute style="width: 100%;">
         <v-btn icon @click.stop="drawerRight = !drawerRight">
@@ -83,7 +84,54 @@
               </v-badge>
 
               <v-list-item-content>
-                <v-list-item-title v-html="item.title"></v-list-item-title>
+                <!-- <v-list-item-title v-html="item.title"></v-list-item-title> -->
+                <v-list-item-title
+                  >{{ item.title }}
+                  <v-chip
+                    class="px-1"
+                    v-if="item.isVerified"
+                    x-small
+                    color="blue"
+                  >
+                    <v-icon x-small class="white--text"
+                      >mdi-check-decagram</v-icon
+                    ></v-chip
+                  >
+                  <!-- <v-chip
+                    class="px-1"
+                    v-if="item.isHost"
+                    x-small
+                    color="primary"
+                  >
+                    <v-icon x-small class="white--text"
+                      >mdi-home</v-icon
+                    ></v-chip
+                  > -->
+                  <!-- <v-btn
+                    icon
+                    class="px-1"
+                    v-if="item.isSeeking"
+                    x-small
+                    color="amber darken-3"
+                  >
+                    <v-icon x-small class="amber--text text--darken-3"
+                      >mdi-account-multiple-plus</v-icon
+                    ></v-btn
+                  > -->
+                  <v-chip
+                    class="ml-1 px-1"
+                    v-if="item.isSupport"
+                    x-small
+                    color="red accent-2"
+                  >
+                    <v-icon x-small class="white--text"
+                      >mdi-shield-account</v-icon
+                    ></v-chip
+                  >
+                  <span class="grey--text text--lighten-1">
+                    &middot; {{ item.time }}</span
+                  ></v-list-item-title
+                >
                 <v-list-item-subtitle
                   v-html="item.subtitle"
                 ></v-list-item-subtitle>
@@ -103,11 +151,131 @@
       dark
     >
       <v-app-bar-nav-icon @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title>Toolbar</v-toolbar-title>
+      <v-toolbar-title>App Name</v-toolbar-title>
       <v-spacer></v-spacer>
-      <v-app-bar-nav-icon
-        @click.stop="drawerRight = !drawerRight"
-      ></v-app-bar-nav-icon>
+      <v-menu
+        v-model="profileMenu"
+        bottom
+        right
+        transition="slide-x-transition"
+        offset-y
+        origin="top left"
+      >
+        <template v-slot:activator="{ on }">
+          <v-chip pill class="transparent" v-on="on">
+            <v-avatar left>
+              <v-img src="https://cdn.vuetifyjs.com/images/john.png"></v-img>
+            </v-avatar>
+            <span v-if="$vuetify.breakpoint.smAndUp">@username</span>
+          </v-chip>
+        </template>
+        <v-card width="300">
+          <v-list dark>
+            <v-list-item>
+              <v-list-item-avatar>
+                <v-img src="https://cdn.vuetifyjs.com/images/john.png"></v-img>
+              </v-list-item-avatar>
+              <v-list-item-content>
+                <v-list-item-title>@username</v-list-item-title>
+                <v-list-item-subtitle>john@vuetifyjs.com</v-list-item-subtitle>
+              </v-list-item-content>
+              <v-list-item-action>
+                <v-btn icon @click="menu = false">
+                  <v-icon>mdi-close-circle</v-icon>
+                </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list>
+          <v-list>
+            <v-list-item @click="() => {}">
+              <v-list-item-action>
+                <v-icon>mdi-briefcase</v-icon>
+              </v-list-item-action>
+              <v-list-item-subtitle>john@gmail.com</v-list-item-subtitle>
+            </v-list-item>
+          </v-list>
+        </v-card>
+      </v-menu>
+
+      <v-menu
+        :max-height="$vuetify.breakpoint.height / 1.2"
+        style="overflow-y: scroll;"
+        bottom
+        right
+        offset-y
+        transition="slide-x-transition"
+      >
+        <template v-slot:activator="{ on, attrs }">
+          <v-btn text icon class="mr-4" dark v-bind="attrs" v-on="on">
+            <v-badge content="3" value="3" color="primary" overlap>
+              <v-icon>mdi-bell</v-icon>
+            </v-badge>
+          </v-btn>
+        </template>
+        <v-card max-width="300" class="px-0">
+          <v-toolbar style="width: 100%;" elevation="0">
+            <v-toolbar-title>Notifications</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn icon>
+              <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </v-toolbar>
+          <v-divider inset></v-divider>
+          <v-card-text class="pa-0">
+            <div>
+              <v-list three-line class="py-0">
+                <v-list-item
+                  v-for="(notif, index) in notifications"
+                  :key="index"
+                  @click="notifClick($event)"
+                  class="pl-0"
+                >
+                  <v-badge
+                    overlap
+                    bordered
+                    bottom
+                    :icon="
+                      notif.type == 'chat' ? 'mdi-forum' : 'mdi-home-account'
+                    "
+                    offset-x="25"
+                    offset-y="25"
+                    :color="notif.type == 'chat' ? 'primary' : 'blue'"
+                  >
+                    <v-list-item-avatar size="48">
+                      <v-img :src="notif.userAvatar"></v-img>
+                    </v-list-item-avatar>
+                  </v-badge>
+                  <v-list-item-content>
+                    <v-list-item-subtitle
+                      class="text--primary"
+                      v-if="notif.type == 'chat'"
+                      ><span class="font-weight-bold">{{ notif.from }}</span>
+                      sent you an invitation to chat
+                      <span class="text-subtitle-2 grey--text"
+                        >&middot; {{ notif.time }}</span
+                      >
+                    </v-list-item-subtitle>
+                    <v-list-item-subtitle v-else class="text--primary">
+                      <span class="font-weight-bold">{{ notif.from }}</span>
+                      sent you another thing
+                      <span class="text-subtitle-2 grey--text"
+                        >&middot; {{ notif.time }}</span
+                      >
+                    </v-list-item-subtitle>
+                  </v-list-item-content>
+                </v-list-item>
+              </v-list>
+            </div>
+          </v-card-text>
+          <v-divider></v-divider>
+          <v-card-actions>
+            <v-btn block color="primary">
+              View All Notifications
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-menu>
+
       <v-btn text icon class="mr-4" @click.stop="drawerRight = !drawerRight">
         <v-badge content="3" value="3" color="primary" overlap>
           <v-icon>mdi-forum</v-icon>
@@ -314,8 +482,8 @@
             <v-list-item-avatar size="62" class="mx-2">
               <img src="https://randomuser.me/api/portraits/men/81.jpg" />
             </v-list-item-avatar>
-            <div class="subheading">Jonathan Lee</div>
-            <div class="body-1">heyfromjonathan@gmail.com</div>
+            <div class="subheading">@jonathan_lee</div>
+            <div class="body-1">jonathan@gmail.com</div>
           </v-col>
         </v-row>
       </v-img>
@@ -546,6 +714,11 @@ export default {
   props: {
     source: String
   },
+  methods: {
+    notifClick(e) {
+      console.log(e);
+    }
+  },
   computed: {
     chat() {
       if (this.chatSearch.trim()) {
@@ -558,6 +731,86 @@ export default {
     }
   },
   data: () => ({
+    profileMenu: false,
+    notifications: [
+      {
+        title: 'Notification 1',
+        type: 'chat',
+        from: '@name321user',
+        time: '3m ago',
+        userAvatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg'
+      },
+      {
+        title: 'Notification 2',
+        type: 'news',
+        from: '@ladyUser',
+        time: '2d ago',
+        userAvatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg'
+      },
+      {
+        title: 'Notification 3',
+        type: 'update',
+        from: '@AppName',
+        time: '1w ago',
+        userAvatar: 'https://cdn.vuetifyjs.com/images/logos/v.png'
+      },
+      {
+        title: 'Notification 4',
+        type: 'listing',
+        from: '@name321user',
+        time: '24 Aug',
+        userAvatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg'
+      }
+      // {
+      //   title: 'Notification 1',
+      //   type: 'chat',
+      //   from: '@name321user',
+      //   time: '3m ago',
+      //   userAvatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg'
+      // },
+      // {
+      //   title: 'Notification 2',
+      //   type: 'news',
+      //   from: '@ladyUser',
+      //   time: '2d ago',
+      //   userAvatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg'
+      // },
+      // {
+      //   title: 'Notification 3',
+      //   type: 'update',
+      //   from: '@AppName',
+      //   time: '1w ago',
+      //   userAvatar: 'https://cdn.vuetifyjs.com/images/logos/v.png'
+      // },
+      // {
+      //   title: 'Notification 4',
+      //   type: 'listing',
+      //   from: '@name321user',
+      //   time: '24 Aug',
+      //   userAvatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg'
+      // },
+      // {
+      //   title: 'Notification 1',
+      //   type: 'chat',
+      //   from: '@name321user',
+      //   time: '3m ago',
+      //   userAvatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg'
+      // },
+      // {
+      //   title: 'Notification 2',
+      //   type: 'news',
+      //   from: '@ladyUser',
+      //   time: '2d ago',
+      //   userAvatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg'
+      // },
+      // {
+      //   title: 'Notification 3',
+      //   type: 'update',
+      //   from: '@AppName',
+      //   time: '1w ago',
+      //   userAvatar: 'https://cdn.vuetifyjs.com/images/logos/v.png'
+      // }
+    ],
     isSearchingChat: false,
     chatSearch: '',
     model: 0,
@@ -580,104 +833,176 @@ export default {
       { header: 'Today', title: 'test', divider: true, inset: false },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
-        title: 'Brunch this weekend?',
+        title: '@username234',
+        time: '1s',
+        isHost: true,
+        isSeeking: true,
+        isREA: false,
+        isSupport: true,
         isOnline: true,
         subtitle:
-          "<span class='text--primary'>Ali Connors</span> &mdash; I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
+          "&mdash; I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
       },
       { title: 'test', divider: true, inset: true },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
-        title: 'Summer BBQ <span class="grey--text text--lighten-1">4</span>',
+        title: '@user567',
+        time: '2m',
         isOnline: true,
-        subtitle:
-          "<span class='text--primary'>to Alex, Scott, Jennifer</span> &mdash; Wish I could come, but I'm out of town this weekend."
+        isSeeking: true,
+        isREA: false,
+        isSupport: true,
+        subtitle: "&mdash; Wish I could come, but I'm out of town this weekend."
       },
       { title: 'test', divider: true, inset: true },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
-        title: 'Oui oui',
+        title: '@ladyuser13',
+        time: '10m',
+        isHost: true,
+        isVerified: true,
+        isSeeking: true,
+        isREA: false,
+        isSupport: true,
         isOnline: false,
         subtitle:
-          "<span class='text--primary'>Sandra Adams</span> &mdash; Do you have Paris recommendations? Have you ever been?"
+          '&mdash; Do you have Paris recommendations? Have you ever been?'
       },
       { title: 'test', divider: true, inset: true },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
-        title: 'Birthday gift',
+        title: '@person_yo',
+        time: '1h',
+        isHost: true,
+        isVerified: true,
+        isSeeking: true,
+        isREA: false,
+        isSupport: true,
         isOnline: true,
         subtitle:
-          "<span class='text--primary'>Trevor Hansen</span> &mdash; Have any ideas about what we should get Heidi for her birthday?"
+          '&mdash; Have any ideas about what we should get Heidi for her birthday?'
       },
       { title: 'test', divider: true, inset: true },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
-        title: 'Recipe to try',
+        title: '@individualist',
+        time: '2h',
+        isHost: true,
+        isVerified: true,
+        isSeeking: true,
+        isREA: false,
+        isSupport: true,
         isOnline: false,
         subtitle:
-          "<span class='text--primary'>Britta Holt</span> &mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos."
+          '&mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos.'
       },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
-        title: 'Summer BBQ 2 <span class="grey--text text--lighten-1">4</span>',
+        title: '@summertimeguy',
+        time: '4h',
+        isHost: true,
+        isSeeking: true,
+        isVerified: true,
+        isREA: false,
+        isSupport: true,
         isOnline: true,
-        subtitle:
-          "<span class='text--primary'>to Alex, Scott, Jennifer</span> &mdash; Wish I could come, but I'm out of town this weekend."
+        subtitle: "&mdash; Wish I could come, but I'm out of town this weekend."
       },
       { title: 'test', divider: true, inset: true },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
-        title: 'Oui oui 2',
+        title: '@ilovecake',
+        time: '5h',
+        isHost: true,
+        isSeeking: true,
+        isREA: false,
+        isVerified: true,
+        isSupport: true,
         isOnline: false,
         subtitle:
-          "<span class='text--primary'>Sandra Adams</span> &mdash; Do you have Paris recommendations? Have you ever been?"
+          '&mdash; Do you have Paris recommendations? Have you ever been?'
       },
       { title: 'test', divider: true, inset: true },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
-        title: 'Birthday gift 2',
+        title: '@the_ghosted',
+        time: '1d',
+        isHost: true,
+        isSeeking: true,
+        isVerified: true,
+        isREA: false,
+        isSupport: true,
         isOnline: true,
         subtitle:
-          "<span class='text--primary'>Trevor Hansen</span> &mdash; Have any ideas about what we should get Heidi for her birthday?"
+          '&mdash; Have any ideas about what we should get Heidi for her birthday?'
       },
       { title: 'test', divider: true, inset: true },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
-        title: 'Recipe to try 2',
+        title: '@someonespecial',
+        time: '2d',
+        isHost: true,
+        isSeeking: true,
+        isVerified: true,
+        isREA: false,
+        isSupport: true,
         isOnline: false,
         subtitle:
-          "<span class='text--primary'>Britta Holt</span> &mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos."
+          '&mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos.'
       },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
-        title: 'Summer BBQ 3 <span class="grey--text text--lighten-1">4</span>',
+        title: '@user_name50',
+        time: '2d',
+        isHost: false,
+        isSeeking: true,
+        isREA: false,
+        isVerified: true,
+        isSupport: true,
         isOnline: true,
-        subtitle:
-          "<span class='text--primary'>to Alex, Scott, Jennifer</span> &mdash; Wish I could come, but I'm out of town this weekend."
+        subtitle: "&mdash; Wish I could come, but I'm out of town this weekend."
       },
       { title: 'test', divider: true, inset: true },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
-        title: 'Oui oui 3',
+        title: '@micheal_john',
+        time: '01 Sep',
+        isHost: true,
+        isSeeking: true,
+        isREA: false,
+        isVerified: true,
+        isSupport: true,
         isOnline: false,
         subtitle:
-          "<span class='text--primary'>Sandra Adams</span> &mdash; Do you have Paris recommendations? Have you ever been?"
+          '&mdash; Do you have Paris recommendations? Have you ever been?'
       },
       { title: 'test', divider: true, inset: true },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
-        title: 'Birthday gift 3',
+        title: '@tony_zed',
+        time: '31 Aug',
+        isHost: true,
+        isSeeking: true,
+        isREA: false,
+        isVerified: true,
+        isSupport: true,
         isOnline: true,
         subtitle:
-          "<span class='text--primary'>Trevor Hansen</span> &mdash; Have any ideas about what we should get Heidi for her birthday?"
+          '&mdash; Have any ideas about what we should get Heidi for her birthday?'
       },
       { title: 'test', divider: true, inset: true },
       {
         avatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
-        title: 'Recipe to try 3',
+        title: '@john_oliver',
+        time: '30 Aug',
+        isHost: true,
+        isSeeking: true,
+        isVerified: true,
+        isREA: false,
+        isSupport: true,
         isOnline: false,
         subtitle:
-          "<span class='text--primary'>Britta Holt</span> &mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos."
+          '&mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos.'
       }
     ],
     leftItems: [
