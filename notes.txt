@@ -471,3 +471,18 @@ Edit
 Back
 Next
 Guests will only be able to book instantly with you if they meet all these requirements and agree to your House Rules.
+
+
+Menu options:
+1. Messages,
+2. Notifications,
+3. My Listings (user Listings CRUD), 
+4. My Rentals,
+5. My Offers,
+6. My Likes,
+7. Chat,
+8. Dashboard,
+9. Bookings,
+10. Support / Feedback,
+11. Help & Info,
+12. Transactions,

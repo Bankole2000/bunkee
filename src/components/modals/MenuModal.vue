@@ -18,15 +18,140 @@
         <v-divider></v-divider>
         <v-card-text style="height: 300px;" class="pb-0">
           <v-row class="text-center mt-6">
-            <v-col cols="6" v-for="n in 8" :key="n">
+            <v-col cols="6">
               <v-badge bordered overlap content="6">
-                <v-avatar size="50">
-                  <v-img
-                    src="https://cdn.vuetifyjs.com/images/john.png"
-                  ></v-img>
+                <v-avatar size="50" tile>
+                  <v-img :src="require('@/assets/icons/email.svg')"></v-img>
                 </v-avatar>
               </v-badge>
               <p>Messages</p>
+            </v-col>
+            <v-col cols="6">
+              <v-badge bordered overlap content="6">
+                <v-avatar size="50" tile>
+                  <v-img :src="require('@/assets/icons/bell.svg')"></v-img>
+                </v-avatar>
+              </v-badge>
+              <p>Notifications</p>
+            </v-col>
+            <v-col cols="6">
+              <v-badge bordered overlap content="6">
+                <v-avatar size="50" tile>
+                  <v-img :src="require('@/assets/icons/chat.svg')"></v-img>
+                </v-avatar>
+              </v-badge>
+              <p>Chat</p>
+            </v-col>
+            <v-col cols="6">
+              <v-badge avatar bordered overlap icon="mdi-plus">
+                <v-avatar size="50" tile>
+                  <v-img :src="require('@/assets/icons/house1.svg')"></v-img>
+                </v-avatar>
+              </v-badge>
+              <p>My Listings</p>
+            </v-col>
+            <v-col cols="6">
+              <v-badge bordered overlap content="6">
+                <v-avatar size="50" tile>
+                  <v-img :src="require('@/assets/icons/calendar.svg')"></v-img>
+                </v-avatar>
+              </v-badge>
+              <p>My Bookings</p>
+            </v-col>
+            <v-col cols="6">
+              <v-badge bordered overlap content="6">
+                <v-avatar size="50" tile>
+                  <v-img
+                    :src="require('@/assets/icons/realestate.svg')"
+                  ></v-img>
+                </v-avatar>
+              </v-badge>
+              <p>My Rentals</p>
+            </v-col>
+            <v-col cols="6">
+              <v-badge bordered overlap content="6">
+                <v-avatar size="50" tile>
+                  <v-img
+                    :src="require('@/assets/icons/businessreport.svg')"
+                  ></v-img>
+                </v-avatar>
+              </v-badge>
+              <p>Dashboard</p>
+            </v-col>
+
+            <v-col cols="6">
+              <v-badge bordered overlap content="6">
+                <v-avatar size="50" tile>
+                  <v-img :src="require('@/assets/icons/employee.svg')"></v-img>
+                </v-avatar>
+              </v-badge>
+              <p>Cooperatives</p>
+            </v-col>
+            <v-col cols="6">
+              <v-badge bordered overlap content="6">
+                <v-avatar size="50" tile>
+                  <v-img
+                    :src="require('@/assets/icons/technicalsupport.svg')"
+                  ></v-img>
+                </v-avatar>
+              </v-badge>
+              <p>Support / Feedback</p>
+            </v-col>
+            <v-col cols="6">
+              <v-badge bordered overlap content="6">
+                <v-avatar size="50" tile>
+                  <v-img
+                    :src="require('@/assets/icons/information.svg')"
+                  ></v-img>
+                </v-avatar>
+              </v-badge>
+              <p>Help & Info</p>
+            </v-col>
+            <v-col cols="6">
+              <v-badge bordered overlap content="6">
+                <v-avatar size="50" tile>
+                  <v-img :src="require('@/assets/icons/handshake.svg')"></v-img>
+                </v-avatar>
+              </v-badge>
+              <p>Offers</p>
+            </v-col>
+            <v-col cols="6">
+              <v-badge bordered overlap content="6">
+                <v-avatar size="50" tile>
+                  <v-img :src="require('@/assets/icons/cash.svg')"></v-img>
+                </v-avatar>
+              </v-badge>
+              <p>Transactions</p>
+            </v-col>
+
+            <v-col cols="6">
+              <v-badge bordered overlap content="6">
+                <v-avatar size="50" tile>
+                  <v-img :src="require('@/assets/icons/love.svg')"></v-img>
+                </v-avatar>
+              </v-badge>
+              <p>My Favorites</p>
+            </v-col>
+            <v-col cols="6">
+              <v-badge bordered overlap content="6" v-if="loggedInUser">
+                <v-avatar size="50" tile>
+                  <v-img
+                    v-if="['male', 'Male'].includes(loggedInUser.gender)"
+                    :src="require('@/assets/icons/man.svg')"
+                  ></v-img>
+                  <v-img
+                    v-if="['female', 'Female'].includes(loggedInUser.gender)"
+                    :src="require('@/assets/icons/woman.svg')"
+                  ></v-img>
+                </v-avatar>
+              </v-badge>
+              <v-badge bordered overlap content="6" v-else>
+                <v-avatar size="50" tile>
+                  <v-img :src="require('@/assets/icons/person.svg')"></v-img>
+                </v-avatar>
+              </v-badge>
+              <p v-if="loggedInUser">My Profile</p>
+              <p v-else>Login</p>
             </v-col>
           </v-row>
         </v-card-text>
@@ -43,11 +168,15 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 export default {
   data() {
     return {
       dialog: false,
     };
+  },
+  computed: {
+    ...mapGetters(['loggedInUser']),
   },
 };
 </script>

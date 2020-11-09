@@ -30,24 +30,17 @@
 
     <v-spacer></v-spacer>
 
-    <v-btn icon>
-      <v-icon>mdi-account-circle</v-icon>
-    </v-btn>
-    <v-badge bordered overlap dot offset-x="20" offset-y="20">
+    <!-- <v-badge bordered overlap dot offset-x="20" offset-y="20">
       <v-btn icon>
         <v-icon>mdi-bell</v-icon>
       </v-btn>
-    </v-badge>
+    </v-badge> -->
+    <Notifications />
     <ChatModal />
 
     <MenuModal />
 
     <template v-slot:extension>
-      <!-- <v-tabs align-with-title>
-        <v-tab>Tab 1</v-tab>
-        <v-tab>Tab 2</v-tab>
-        <v-tab>Tab 3</v-tab>
-      </v-tabs> -->
       <v-text-field
         align-with-title
         light
@@ -65,10 +58,12 @@
 <script>
 import MenuModal from '../modals/MenuModal';
 import ChatModal from '../modals/MobileChatModal';
+import Notifications from '../modals/Notifications';
 export default {
   components: {
     ChatModal,
     MenuModal,
+    Notifications,
   },
   data() {
     return {
