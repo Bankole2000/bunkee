@@ -188,3 +188,286 @@ Link is the normal appearance, hover is when you mouse over, active is the state
 
 
 <span class="grey--text text--lighten-1">4</span>
+
+
+google maps api key = AIzaSyAom4fLGWx87Qe9Nbj-jU0hd-EIzubuRz8
+
+Airbnb questions
+  Step 1. What kind of place do you have 
+    - place type - Options - ['Entire Place', 'Private Room', 'Shared Room']
+    - For how many guests? Options - 1 - 16 guests ✔️
+    - Location - Google maps Places autocomplete search. 
+
+  Step 2. What kind of place are you listing 
+    - place type - options - ['Apartment', 'House', "Sec Unit", 'Unique space', 'Bed and Breakfast', 'Boutique Hotel']
+    - property type - options depending on place type
+      ['Apartment'] => ['Apartment', 'Condomimium', 'Casa Particular (Cuba)', 'Loft', 'Serviced Apartment']
+      ['House'] => ['House', 'Bungalow', 'Cabin', 'Casa Particular (Cuba)', 'Chalet', 'Cottage', 'Cycladic House (Greece)', 'Dammuso (Italy)', 'Dome House', 'Earth House', 'Farmstay', 'Houseboat', 'Hut', 'Light House', 'Pension (South Korea)', 'Shepherds Hut (U.K France)', 'Tiny House', 'Town House', 'Trullo (Italy)', 'Villa']
+      ['Secondary Unit'] => ['Guest House', 'Guest Suite', 'Farm Stay']
+      ['Unique Space'] => ['Barn', 'Boat', 'Bus', 'Camper/RV', 'CampSite', 'Castle', 'Cave', 'Dome house', 'Earth House', 'Farm stay', 'House boat', 'Hut', 'Igloo', 'Island', 'Lighthouse', 'Pension (South Korea)', 'Plane', 'Shepherds Hut (U.K France)', 'Tent', 'Tiny House', 'Tipi', 'Train', 'Treehouse', 'Windmill', 'Yurt', 'Komika (Japan)']
+      ['Bread and Breakfase'] => ['Bed n breakfast', 'Casa Particular', 'Farmstay', 'Minsu (Taiwan)', 'Nature Lodge', 'Ryokan (Japan)']
+      ['Boutique Hotel'] => ['Boutique Hotel', 'Aparthotel', 'Heritage Hotel (India)', 'Hostel', 'Hotel', 'Nature Lodge', 'Resort', 'Serviced Apartment', 'Kezhan (China)']
+
+      ON select => Modal - THis listing will go through review - Text content e.g. {A Bed & Breakfast on Airbnb should be a licensed hospitality business and will go through review to make sure it meets our criteria. This helps listings appear in the right searches and lets guests know what to expect.
+                            If that doesn’t sound like this property, change the property type.
+                            Learn more}
+
+    - What will guests have?
+     [Radio options] -  
+      [ ] Entire place
+      Guests have the whole place to themselves. This usually includes a bedroom, a bathroom, and a kitchen.
+      [ ] Private room
+      Guests have their own private room for sleeping. Other areas could be shared.
+      [ ] Shared room
+      Guests sleep in a bedroom or a common area that could be shared with others.
+
+    - Is this set up as a dedicated guest space?
+      [ ] Yes, it’s primarily set up for guests
+      [ ] No, I keep my personal belongings here
+
+    - Are you listing on Airbnb as part of a company?
+      [ ] I’m hosting as a registered business
+      [ ] I’m hosting as an individual or sole owner
+
+    This helps you get the right features for how you host—it won’t show up to guests or impact how you show up in search.
+
+  Step 3: How many guests can your place accomodate? 
+    check that you have enough beds to accommodate all your guests comfortably. 
+    Guests = + or - 
+    How many beds can guests use 
+    no of beds 
+    Sleeping arrangements (Sharing the types of beds in each room can help people understand the sleeping arrangements)
+    Bedroom (0 beds, btn - add beds) , Common Space (0 beds, btn - add beds)
+    on add bed click 
+    Bedroom type of beds ['Double', 'Queen', 'Single', 'Sofa Bed']
+    Common Space type of beds ['Sofa bed', 'couch', 'floor Mattress']
+
+  Step 4: How many bathrooms? 
+  Step 5: Where is your place located? (Guests will only get your exact address once they've booked a reservation)
+  options => [ 🗺️ Use Current location ] or enter location data 
+  location data 
+    - Country / Region [auto fill with current county]
+    - Street Address (House name / number + street / road)
+    - Apt, suite. (OPtional)
+    - City, state, Zip Code
+  If USe current location unavailable prompt user to use location form 
+
+  Step 5 - Is the Pin in the right place? 
+    text {If needed, you can adjust the map so the pin is in the right location. Only confirmed guests will see this, so they know how to get to your place.}
+    - Google maps move pin. 
+  
+  Step 6 - What amenities do you offer ? 
+        What amenities do you offer?
+      These are just the amenities guests usually expect, but you can add even more after you publish.
+    Check boxes
+Essentials
+Towels, bed sheets, soap, toilet paper, and pillows
+
+Wifi
+
+TV
+
+Heat
+
+Air conditioning
+
+Iron
+
+Shampoo
+
+Hair dryer
+
+Breakfast, coffee, tea
+
+Desk/workspace
+
+Fireplace
+
+Closet/drawers
+
+Safety amenities
+
+Smoke detector
+Check your local laws, which may require a working smoke detector in every room
+
+Carbon monoxide detector
+Check your local laws, which may require a working carbon monoxide detector in every room
+
+First aid kit
+
+Fire extinguisher
+
+Lock on bedroom door
+Private room can be locked for safety and privacy
+
+Step 6 - What spaces can guests use?
+Include common areas, but don’t add spaces that aren’t on your property.
+
+Kitchen
+
+Laundry – washer
+
+Laundry – dryer
+
+Parking
+
+Gym
+
+Pool
+
+Hot tub
+
+Does your space have accessibility features?
+Every month, thousands of guests search for listings with accessibility features. Adding these features can help your listing get more attention and makes travel possible for more people.
+
+You’ll have the chance to tell guests which accessibility features you have once you’ve finished listing your space. We can remind you to add these features and show you how to take good photos of them.
+Email me about adding accessibility features later [switch]
+
+Step 7 - Liven up your listing with photos
+Take photos using a phone or camera. Upload at least one photo to publish your listing—you can always add more or edit later. 
+[option to skip][image area upload][tips for quality photos]
+Tips for quality photos => Tips for quality photos
+Declutter your space
+Use natural daylight and avoid flash
+Shoot from room corners in landscape mode
+Balance visible floor and ceiling space
+Highlight special decor and amenities
+Add photos of every room guests can access
+
+Step 8 
+Describe your place to guests
+Mention the best features of your space, any special amenities like fast wifi or parking, and what you love about the neighborhood.
+500
+Your space (optional)
+Describe the look and feel of your space. Point out any special design elements or areas, like a cozy reading corner or outdoor seating.
+Your interaction with guests (optional)
+Share how available you'll be during a guest’s stay. For your safety, don't share your phone number or email until a reservation is confirmed.
+Your neighborhood (optional)
+Share what makes your neighborhood special, such as the vibe, nearby cafes, a unique landmark, or a walkable destination.
+Getting around (optional)
+Add info about getting around your city or neighborhood, like nearby public transportation, driving tips, or good walking routes.
+
+Step 9 
+Create a title for your listing
+Catch guests’ attention with a listing title that highlights what makes your place special.
+e.g. Abuja Home with a View
+
+Step 10 
+Add your photo = options [ use facebook photo ][upload photo]
+hint Make sure the photo clearly shows your face.
+
+on image uplaod - 
+This photo will be added to your profile. It will also be seen by hosts or guests—so be sure it doesn’t include any personal or sensitive info.
+
+Step 11
+Mobile number verification 
+Add your mobile number
+We’ll send you booking requests, reminders, and other notifications. This number should be able to receive texts or calls.
+Phone Country Select
+
+Nigeria (+234)
+Phone Number Input
++234
+Verify
+Back
+Next
+Coming up, we’ll ask if it’s OK for guests to use this number to contact you. If it’s not OK, you can add another number for guests to use.
+
+
++234 806 916 6906
+Verified
+Can guests use this number to get in touch with you?
+Can guests use this number to get in touch with you?
+	Yes, guests can use this number
+	No, add another number for guests 
+
+
+
+Review Airbnb’s guest requirements
+Airbnb has requirements that all guests must meet before they book.
+All Airbnb guests must provide:
+Email address
+Confirmed phone number
+Payment information
+Before booking your home, each guest must:
+Agree to your House Rules
+Message you about their trip
+Let you know how many guests are coming
+Confirm their check-in time if they’re arriving within 2 days
+
+Add additional requirements
+
+Government-issued ID submitted to Airbnb
+
+Recommended by other hosts and have no negative reviews
+More requirements can mean fewer reservations. 
+
+Set house rules for your guests
+Guests must agree to your house rules before they book.
+Suitable for children (2-12 years)
+
+
+
+Suitable for infants (Under 2 years)
+
+
+
+Suitable for pets
+
+
+
+Smoking allowed
+
+
+Events allowed
+
+
+Additional rules
+Quiet hours? No shoes in the house?
+Add
+Details guests must know about your home
+
+Must climb stairs
+
+Potential for noise
+
+Pet(s) live on property
+
+No parking on property
+
+Some spaces are shared
+
+Amenity limitations
+
+Surveillance or recording devices on property
+
+Weapons on property
+
+Dangerous animals on property
+
+
+Add descriptions to details on click 
+
+
+Review your guest requirements
+Guests can only book without sending a request if they meet all your requirements and agree to your house rules.
+Airbnb’s guest requirements
+Email address
+Confirmed phone number
+Payment information
+A message about the guest’s trip
+Check-in time for last minute trips
+Review
+Your additional requirements
+No additional requirements
+
+Edit
+Your House Rules
+Smoking allowed
+Not suitable for children and infants
+No pets
+No parties or events
+Edit
+Back
+Next
+Guests will only be able to book instantly with you if they meet all these requirements and agree to your House Rules.

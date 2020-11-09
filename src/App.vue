@@ -1,56 +1,80 @@
 <template>
   <v-app>
-    <!-- <v-app-bar app color="primary" dark>
-      <div class="d-flex align-center">
-        <v-img
-          alt="Vuetify Logo"
-          class="shrink mr-2"
-          contain
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-logo-dark.png"
-          transition="scale-transition"
-          width="40" />
-
-        <v-img
-          alt="Vuetify Name"
-          class="shrink mt-1 hidden-sm-and-down"
-          contain
-          min-width="100"
-          src="https://cdn.vuetifyjs.com/images/logos/vuetify-name-dark.png"
-          width="100"
-        />
-      </div>
-
-      <v-spacer></v-spacer>
-
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
-        target="_blank"
-        text
-      >
-        <span class="mr-2">Latest Release</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
-    </v-app-bar> -->
-
+    <Navbar v-if="!$vuetify.breakpoint.smAndDown" />
+    <MobilePageTitle v-if="$vuetify.breakpoint.smAndDown" />
     <v-main>
-      <router-view />
-      <!-- <HelloWorld /> -->
+      <transition name="router-anim">
+        <router-view />
+      </transition>
     </v-main>
+    <BottomNav v-if="$vuetify.breakpoint.smAndDown" />
+    <Snackbar />
+    <Loader />
   </v-app>
 </template>
 
 <script>
-// import HelloWorld from './components/HelloWorld';
-
+import { mapActions } from 'vuex';
+import Snackbar from './components/shared/Snackbar';
+import Loader from './components/shared/Loader';
+import Navbar from './components/shared/Navbar';
+import BottomNav from './components/shared/BottomNav';
+import MobilePageTitle from './components/shared/MobilePageTitle';
 export default {
   name: 'App',
 
   components: {
-    // HelloWorld
+    Snackbar,
+    Loader,
+    Navbar,
+    MobilePageTitle,
+    BottomNav,
   },
 
   data: () => ({
     //
-  })
+  }),
+  methods: {
+    ...mapActions(['showToast', 'showLoader', 'hideLoader']),
+    displayLoader() {
+      this.showLoader({ lclass: 'info', message: 'Hello world' });
+      setTimeout(() => {
+        this.hideLoader();
+      }, 2000);
+    },
+  },
 };
 </script>
+
+<style>
+.router-anim-enter-active {
+  animation: coming 0.5s;
+  animation-delay: 0.5s;
+  opacity: 0;
+}
+
+.router-anim-leave-active {
+  animation: going 0.4s;
+}
+
+@keyframes going {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+}
+
+@keyframes coming {
+  from {
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+}
+</style>

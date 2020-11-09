@@ -7,7 +7,7 @@
       :style="{
         maxWidth: $vuetify.breakpoint.mdAndUp
           ? $vuetify.breakpoint.width / 3
-          : '350'
+          : '350',
       }"
       v-model="drawerRight"
       app
@@ -307,7 +307,7 @@
       :class="{
         'mx-4': $vuetify.breakpoint.width > 450,
         'mt-n2': true,
-        'mx-0': $vuetify.breakpoint.width < 450
+        'mx-0': $vuetify.breakpoint.width < 450,
       }"
       :min-width="
         drawerRight
@@ -322,7 +322,6 @@
           class="mt-7"
           rounded
           solo
-          autofocus
           name="placeSearch"
           label="Search by Location, City, or State"
           id="test"
@@ -712,12 +711,12 @@
 <script>
 export default {
   props: {
-    source: String
+    source: String,
   },
   methods: {
     notifClick(e) {
       console.log(e);
-    }
+    },
   },
   computed: {
     chat() {
@@ -728,39 +727,39 @@ export default {
       } else {
         return this.items;
       }
-    }
+    },
   },
   data: () => ({
     profileMenu: false,
     notifications: [
       {
-        title: "Notification 1",
-        type: "chat",
-        from: "@name321user",
-        time: "3m ago",
-        userAvatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg"
+        title: 'Notification 1',
+        type: 'chat',
+        from: '@name321user',
+        time: '3m ago',
+        userAvatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
       },
       {
-        title: "Notification 2",
-        type: "news",
-        from: "@ladyUser",
-        time: "2d ago",
-        userAvatar: "https://cdn.vuetifyjs.com/images/lists/3.jpg"
+        title: 'Notification 2',
+        type: 'news',
+        from: '@ladyUser',
+        time: '2d ago',
+        userAvatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
       },
       {
-        title: "Notification 3",
-        type: "update",
-        from: "@AppName",
-        time: "1w ago",
-        userAvatar: "https://cdn.vuetifyjs.com/images/logos/v.png"
+        title: 'Notification 3',
+        type: 'update',
+        from: '@AppName',
+        time: '1w ago',
+        userAvatar: 'https://cdn.vuetifyjs.com/images/logos/v.png',
       },
       {
-        title: "Notification 4",
-        type: "listing",
-        from: "@name321user",
-        time: "24 Aug",
-        userAvatar: "https://cdn.vuetifyjs.com/images/lists/4.jpg"
-      }
+        title: 'Notification 4',
+        type: 'listing',
+        from: '@name321user',
+        time: '24 Aug',
+        userAvatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
+      },
       // {
       //   title: 'Notification 1',
       //   type: 'chat',
@@ -812,53 +811,54 @@ export default {
       // }
     ],
     isSearchingChat: false,
-    chatSearch: "",
-    model: 0,
+    chatSearch: '',
+    model: null,
     drawer: null,
-    drawerRight: true,
+    drawerRight: false,
     right: false,
     left: false,
     farRight: false,
     cards: [
       {
-        image: "https://picsum.photos/1920/1080?random",
-        title: "Cool stay place",
-        shortDesc: "",
-        userAvatar: "",
-        userUsername: "",
-        placeRating: ""
-      }
+        image: 'https://picsum.photos/1920/1080?random',
+        title: 'Cool stay place',
+        shortDesc: '',
+        userAvatar: '',
+        userUsername: '',
+        placeRating: '',
+      },
     ],
     items: [
-      { header: "Today", title: "test", divider: true, inset: false },
+      { header: 'Today', title: 'test', divider: true, inset: false },
       {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/1.jpg",
-        title: "@username234",
-        time: "1s",
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
+        title: '@username234',
+        time: '1s',
         isHost: true,
         isSeeking: true,
         isREA: false,
         isSupport: true,
         isOnline: true,
         subtitle:
-          "&mdash; I'll be in your neighborhood doing errands this weekend. Do you want to hang out?"
+          "&mdash; I'll be in your neighborhood doing errands this weekend. Do you want to hang out?",
       },
-      { title: "test", divider: true, inset: true },
+      { title: 'test', divider: true, inset: true },
       {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/2.jpg",
-        title: "@user567",
-        time: "2m",
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
+        title: '@user567',
+        time: '2m',
         isOnline: true,
         isSeeking: true,
         isREA: false,
         isSupport: true,
-        subtitle: "&mdash; Wish I could come, but I'm out of town this weekend."
+        subtitle:
+          "&mdash; Wish I could come, but I'm out of town this weekend.",
       },
-      { title: "test", divider: true, inset: true },
+      { title: 'test', divider: true, inset: true },
       {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/3.jpg",
-        title: "@ladyuser13",
-        time: "10m",
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
+        title: '@ladyuser13',
+        time: '10m',
         isHost: true,
         isVerified: true,
         isSeeking: true,
@@ -866,13 +866,13 @@ export default {
         isSupport: true,
         isOnline: false,
         subtitle:
-          "&mdash; Do you have Paris recommendations? Have you ever been?"
+          '&mdash; Do you have Paris recommendations? Have you ever been?',
       },
-      { title: "test", divider: true, inset: true },
+      { title: 'test', divider: true, inset: true },
       {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/4.jpg",
-        title: "@person_yo",
-        time: "1h",
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
+        title: '@person_yo',
+        time: '1h',
         isHost: true,
         isVerified: true,
         isSeeking: true,
@@ -880,13 +880,13 @@ export default {
         isSupport: true,
         isOnline: true,
         subtitle:
-          "&mdash; Have any ideas about what we should get Heidi for her birthday?"
+          '&mdash; Have any ideas about what we should get Heidi for her birthday?',
       },
-      { title: "test", divider: true, inset: true },
+      { title: 'test', divider: true, inset: true },
       {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/5.jpg",
-        title: "@individualist",
-        time: "2h",
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
+        title: '@individualist',
+        time: '2h',
         isHost: true,
         isVerified: true,
         isSeeking: true,
@@ -894,39 +894,12 @@ export default {
         isSupport: true,
         isOnline: false,
         subtitle:
-          "&mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos."
+          '&mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos.',
       },
       {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/2.jpg",
-        title: "@summertimeguy",
-        time: "4h",
-        isHost: true,
-        isSeeking: true,
-        isVerified: true,
-        isREA: false,
-        isSupport: true,
-        isOnline: true,
-        subtitle: "&mdash; Wish I could come, but I'm out of town this weekend."
-      },
-      { title: "test", divider: true, inset: true },
-      {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/3.jpg",
-        title: "@ilovecake",
-        time: "5h",
-        isHost: true,
-        isSeeking: true,
-        isREA: false,
-        isVerified: true,
-        isSupport: true,
-        isOnline: false,
-        subtitle:
-          "&mdash; Do you have Paris recommendations? Have you ever been?"
-      },
-      { title: "test", divider: true, inset: true },
-      {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/4.jpg",
-        title: "@the_ghosted",
-        time: "1d",
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
+        title: '@summertimeguy',
+        time: '4h',
         isHost: true,
         isSeeking: true,
         isVerified: true,
@@ -934,13 +907,41 @@ export default {
         isSupport: true,
         isOnline: true,
         subtitle:
-          "&mdash; Have any ideas about what we should get Heidi for her birthday?"
+          "&mdash; Wish I could come, but I'm out of town this weekend.",
       },
-      { title: "test", divider: true, inset: true },
+      { title: 'test', divider: true, inset: true },
       {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/5.jpg",
-        title: "@someonespecial",
-        time: "2d",
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
+        title: '@ilovecake',
+        time: '5h',
+        isHost: true,
+        isSeeking: true,
+        isREA: false,
+        isVerified: true,
+        isSupport: true,
+        isOnline: false,
+        subtitle:
+          '&mdash; Do you have Paris recommendations? Have you ever been?',
+      },
+      { title: 'test', divider: true, inset: true },
+      {
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
+        title: '@the_ghosted',
+        time: '1d',
+        isHost: true,
+        isSeeking: true,
+        isVerified: true,
+        isREA: false,
+        isSupport: true,
+        isOnline: true,
+        subtitle:
+          '&mdash; Have any ideas about what we should get Heidi for her birthday?',
+      },
+      { title: 'test', divider: true, inset: true },
+      {
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
+        title: '@someonespecial',
+        time: '2d',
         isHost: true,
         isSeeking: true,
         isVerified: true,
@@ -948,25 +949,26 @@ export default {
         isSupport: true,
         isOnline: false,
         subtitle:
-          "&mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos."
+          '&mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos.',
       },
       {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/2.jpg",
-        title: "@user_name50",
-        time: "2d",
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
+        title: '@user_name50',
+        time: '2d',
         isHost: false,
         isSeeking: true,
         isREA: false,
         isVerified: true,
         isSupport: true,
         isOnline: true,
-        subtitle: "&mdash; Wish I could come, but I'm out of town this weekend."
+        subtitle:
+          "&mdash; Wish I could come, but I'm out of town this weekend.",
       },
-      { title: "test", divider: true, inset: true },
+      { title: 'test', divider: true, inset: true },
       {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/3.jpg",
-        title: "@micheal_john",
-        time: "01 Sep",
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
+        title: '@micheal_john',
+        time: '01 Sep',
         isHost: true,
         isSeeking: true,
         isREA: false,
@@ -974,13 +976,13 @@ export default {
         isSupport: true,
         isOnline: false,
         subtitle:
-          "&mdash; Do you have Paris recommendations? Have you ever been?"
+          '&mdash; Do you have Paris recommendations? Have you ever been?',
       },
-      { title: "test", divider: true, inset: true },
+      { title: 'test', divider: true, inset: true },
       {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/4.jpg",
-        title: "@tony_zed",
-        time: "31 Aug",
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
+        title: '@tony_zed',
+        time: '31 Aug',
         isHost: true,
         isSeeking: true,
         isREA: false,
@@ -988,13 +990,13 @@ export default {
         isSupport: true,
         isOnline: true,
         subtitle:
-          "&mdash; Have any ideas about what we should get Heidi for her birthday?"
+          '&mdash; Have any ideas about what we should get Heidi for her birthday?',
       },
-      { title: "test", divider: true, inset: true },
+      { title: 'test', divider: true, inset: true },
       {
-        avatar: "https://cdn.vuetifyjs.com/images/lists/5.jpg",
-        title: "@john_oliver",
-        time: "30 Aug",
+        avatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
+        title: '@john_oliver',
+        time: '30 Aug',
         isHost: true,
         isSeeking: true,
         isVerified: true,
@@ -1002,19 +1004,19 @@ export default {
         isSupport: true,
         isOnline: false,
         subtitle:
-          "&mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos."
-      }
+          '&mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos.',
+      },
     ],
     leftItems: [
-      { icon: "mdi-inbox", title: "Inbox" },
-      { icon: "mdi-star", title: "Starred" },
-      { icon: "mdi-send", title: "Sent mail" },
-      { icon: "mdi-email-open", title: "Drafts" },
+      { icon: 'mdi-inbox', title: 'Inbox' },
+      { icon: 'mdi-star', title: 'Starred' },
+      { icon: 'mdi-send', title: 'Sent mail' },
+      { icon: 'mdi-email-open', title: 'Drafts' },
       { divider: true },
-      { icon: "mdi-mail", title: "All mail" },
-      { icon: "mdi-delete", title: "Trash" },
-      { icon: "mdi-alert-circle", title: "Spam" }
-    ]
-  })
+      { icon: 'mdi-mail', title: 'All mail' },
+      { icon: 'mdi-delete', title: 'Trash' },
+      { icon: 'mdi-alert-circle', title: 'Spam' },
+    ],
+  }),
 };
 </script>
