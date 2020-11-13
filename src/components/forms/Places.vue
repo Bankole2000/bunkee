@@ -1,6 +1,6 @@
 <template>
   <div class="places-form">
-    <v-card class="fill-height">
+    <v-card class="fill-height" elevation="0">
       <v-window v-model="step">
         <v-window-item :value="1">
           <v-card-text class="pa-0">

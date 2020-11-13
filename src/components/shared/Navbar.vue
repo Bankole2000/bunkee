@@ -55,7 +55,7 @@
         transition="slide-x-transition"
         offset-y
         origin="top left"
-        :close-on-content-click="false"
+        :close-on-content-click="true"
         :close-on-click="false"
       >
         <template v-slot:activator="{ on }">
@@ -128,7 +128,7 @@
               </v-list-item-action>
               <v-list-item-subtitle>Find a Place</v-list-item-subtitle>
             </v-list-item>
-            <v-list-item @click="() => {}">
+            <v-list-item to="/user/listings">
               <v-list-item-action>
                 <v-icon>mdi-home-account</v-icon>
               </v-list-item-action>

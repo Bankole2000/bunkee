@@ -1,80 +1,69 @@
 <template>
   <div class="rentals">
-    <v-app-bar
-      app
-      color="#6A76AB"
-      dark
-      shrink-on-scroll
-      prominent
-      src="https://picsum.photos/1920/1080?random"
-      fade-img-on-scroll
-    >
-      <template v-slot:img="{ props }">
-        <v-img
-          v-bind="props"
-          gradient="to top right, rgba(100,115,201,.7), rgba(25,32,72,.7)"
-        ></v-img>
-      </template>
-
-      <v-app-bar-nav-icon></v-app-bar-nav-icon>
-
-      <v-toolbar-title class="pl-0">Rentals</v-toolbar-title>
-
-      <v-spacer></v-spacer>
-
-      <v-btn icon>
-        <v-icon>mdi-magnify</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-filter-variant</v-icon>
-      </v-btn>
-
-      <v-btn icon>
-        <v-icon>mdi-apps</v-icon>
-      </v-btn>
-
-      <template v-slot:extension>
-        <v-tabs align-with-title>
-          <v-tab>Tab 1</v-tab>
-          <v-tab>Tab 2</v-tab>
-          <v-tab>Tab 3</v-tab>
-        </v-tabs>
-      </template>
-    </v-app-bar>
-    <p class="display-4">Rentals</p>
-    <MenuModal />
     <v-container>
+      <p class=" d-flex align-center display-1 mt-4 mb-2 font-weight-light">
+        Rentals &middot;
+        <span class="font-weight-bold primary--text"
+          ><v-icon>mdi-map-marker</v-icon> Abuja</span
+        >
+      </p>
+      <v-divider></v-divider>
       <v-row>
-        <v-col v-for="n in 4" :key="n" cols="12">
-          <v-card elevation="0">
-            <v-img
-              src="https://picsum.photos/510/300?random"
-              aspect-ratio="1.5"
-              class="rounded-lg"
-            >
-              <v-btn icon dark class="ma-4">
-                <v-icon size="32">
-                  mdi-heart-outline
-                </v-icon>
-              </v-btn></v-img
-            >
-            <v-card-actions
-              ><p class="text-h5 mb-0">A Rental by a landlord / estate agent</p>
-            </v-card-actions>
-          </v-card>
+        <v-col v-for="n in number" :key="n" cols="12" sm="6">
+          <Rental />
         </v-col>
       </v-row>
+      <v-row style="margin-bottom: 80px;">
+        <v-col cols="12"
+          ><v-btn
+            :loading="fetchingMore"
+            :disabled="fetchingMore"
+            @click="addMore"
+            x-large
+            block
+            color="primary"
+          >
+            Show More <v-icon right>mdi-dots-horizontal</v-icon></v-btn
+          ></v-col
+        >
+      </v-row>
     </v-container>
-    <v-card height="900"> </v-card>
   </div>
 </template>
 
 <script>
-import MenuModal from '../components/modals/MenuModal';
+// import MenuModal from '../components/modals/MenuModal';
+import Rental from '../components/blocks/Rental';
 export default {
   components: {
-    MenuModal,
+    // MenuModal,
+    Rental,
+  },
+  data() {
+    return {
+      number: 6,
+      menu: null,
+      fetchingMore: false,
+      page: 1,
+      colors: [
+        'green',
+        'secondary',
+        'yellow darken-4',
+        'red lighten-2',
+        'orange darken-1',
+      ],
+      cycle: false,
+      slides: ['First', 'Second', 'Third', 'Fourth', 'Fifth'],
+    };
+  },
+  methods: {
+    addMore() {
+      this.fetchingMore = true;
+      setTimeout(() => {
+        this.number += 6;
+        this.fetchingMore = false;
+      }, 2000);
+    },
   },
 };
 </script>

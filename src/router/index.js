@@ -9,6 +9,11 @@ import Signup from '@/components/Users/SignupView.vue';
 import Login from '@/components/Users/LoginView.vue';
 import Profile from '@/components/Users/Profile.vue';
 import Listings from '@/views/Listings.vue';
+import SingleListing from '@/views/SingleListing.vue';
+import SingleRental from '@/views/SingleRental.vue';
+import SingleOffer from '@/views/SingleOffer.vue';
+import SingleCoop from '@/views/SingleCoop.vue';
+import ManageListings from '@/views/ManageListings.vue';
 import Rentals from '@/views/Rentals.vue';
 import Offers from '@/views/Offers.vue';
 import Coops from '@/views/Coops.vue';
@@ -62,9 +67,19 @@ const routes = [
     component: Rentals,
   },
   {
+    path: '/rental/:uuid',
+    name: 'Rental Details',
+    component: SingleRental,
+  },
+  {
     path: '/listings',
-    name: 'Listings',
+    name: 'Places',
     component: Listings,
+  },
+  {
+    path: '/listing/:uuid',
+    name: 'Listing Details',
+    component: SingleListing,
   },
   {
     path: '/coops',
@@ -72,19 +87,24 @@ const routes = [
     component: Coops,
   },
   {
+    path: '/coop/:uuid',
+    name: 'Cooperative Details',
+    component: SingleCoop,
+  },
+  {
     path: '/offers',
-    name: 'Offers',
+    name: 'People',
     component: Offers,
   },
   {
-    path: '/listings/add',
-    name: 'Add Listing',
-    component: Test,
+    path: '/offer/:uuid',
+    name: 'Offer Details',
+    component: SingleOffer,
   },
   {
-    path: '/rentals/add',
-    name: 'Add Rental',
-    component: Test,
+    path: '/user/listings',
+    name: 'My Listings',
+    component: ManageListings,
   },
   {
     path: '/about',

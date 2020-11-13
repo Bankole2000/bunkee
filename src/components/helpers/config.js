@@ -3,6 +3,9 @@ const emailRegex = /^[a-z]+(_|\.)?[a-z0-9]*@[a-z]+\.[a-z]{2,}$/i;
 const alphaNumRegex = /^[a-z0-9]+$/i;
 const nameRegex = /^([a-z]){3,}$/i;
 const userNameRegex = /^([a-z0-9_]){3,}$/i;
+const anyWithSpaces = /^([a-z0-9._-])+( [a-z0-9._-]+)*$/i;
+// const wordsWithSpacesRegex = /^\w+( \w+)*$/i;
+const allRegexes = { emailRegex, nameRegex, userNameRegex, anyWithSpaces };
 
 const remote = {
   apiUrl: '',
@@ -285,4 +288,4 @@ validators.isOfAge = (dateLike) => {
   return false;
 };
 
-module.exports = { config, helpers, validators };
+module.exports = { config, helpers, validators, allRegexes };

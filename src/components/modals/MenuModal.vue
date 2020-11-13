@@ -18,7 +18,7 @@
         <v-divider></v-divider>
         <v-card-text style="height: 300px;" class="pb-0">
           <v-row class="text-center mt-6">
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/user/messages')">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img :src="require('@/assets/icons/email.svg')"></v-img>
@@ -26,7 +26,7 @@
               </v-badge>
               <p>Messages</p>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/user/notifications')">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img :src="require('@/assets/icons/bell.svg')"></v-img>
@@ -34,7 +34,7 @@
               </v-badge>
               <p>Notifications</p>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/user/chat')">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img :src="require('@/assets/icons/chat.svg')"></v-img>
@@ -42,7 +42,7 @@
               </v-badge>
               <p>Chat</p>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/user/listings')">
               <v-badge avatar bordered overlap icon="mdi-plus">
                 <v-avatar size="50" tile>
                   <v-img :src="require('@/assets/icons/house1.svg')"></v-img>
@@ -50,7 +50,7 @@
               </v-badge>
               <p>My Listings</p>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/user/bookings')">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img :src="require('@/assets/icons/calendar.svg')"></v-img>
@@ -58,7 +58,7 @@
               </v-badge>
               <p>My Bookings</p>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/user/rentals')">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img
@@ -68,7 +68,7 @@
               </v-badge>
               <p>My Rentals</p>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/user/dashboard')">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img
@@ -79,15 +79,15 @@
               <p>Dashboard</p>
             </v-col>
 
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/user/listings')">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img :src="require('@/assets/icons/employee.svg')"></v-img>
                 </v-avatar>
               </v-badge>
-              <p>Cooperatives</p>
+              <p>My Cooperatives</p>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/support')">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img
@@ -97,7 +97,7 @@
               </v-badge>
               <p>Support / Feedback</p>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/info')">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img
@@ -107,7 +107,7 @@
               </v-badge>
               <p>Help & Info</p>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/user/listings')">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img :src="require('@/assets/icons/handshake.svg')"></v-img>
@@ -115,7 +115,7 @@
               </v-badge>
               <p>Offers</p>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/user/transactions')">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img :src="require('@/assets/icons/cash.svg')"></v-img>
@@ -124,7 +124,7 @@
               <p>Transactions</p>
             </v-col>
 
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/user/likes')">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img :src="require('@/assets/icons/love.svg')"></v-img>
@@ -132,7 +132,7 @@
               </v-badge>
               <p>My Favorites</p>
             </v-col>
-            <v-col cols="6">
+            <v-col cols="6" @click="goTo('/profile/listings')">
               <v-badge bordered overlap content="6" v-if="loggedInUser">
                 <v-avatar size="50" tile>
                   <v-img
@@ -177,6 +177,12 @@ export default {
   },
   computed: {
     ...mapGetters(['loggedInUser']),
+  },
+  methods: {
+    goTo(path) {
+      this.$router.push(path);
+      this.dialog = false;
+    },
   },
 };
 </script>

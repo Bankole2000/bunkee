@@ -7,6 +7,7 @@
     prominent
     src="https://picsum.photos/1920/1080?random"
     fade-img-on-scroll
+    v-if="!['/login', '/signup'].includes($route.path) && !showPage"
   >
     <template v-slot:img="{ props }">
       <v-img
@@ -26,7 +27,7 @@
     </v-btn> -->
     <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
-    <v-toolbar-title class="pl-0">Places</v-toolbar-title>
+    <v-toolbar-title class="pl-0">{{ $route.name }}</v-toolbar-title>
 
     <v-spacer></v-spacer>
 
@@ -68,7 +69,19 @@ export default {
   data() {
     return {
       dialog: false,
+      pageRegex: '',
+      pages: [
+        {
+          title: '',
+          route: '',
+        },
+      ],
     };
+  },
+  computed: {
+    showPage() {
+      return this.$route.name == 'Verify' ? true : false;
+    },
   },
 };
 </script>

@@ -9,13 +9,8 @@
     {{ toast.message }}
 
     <template v-slot:action="{ attrs }">
-      <v-btn
-        dark
-        text
-        v-bind="attrs"
-        :color="toast.sclass"
-        @click="toast.show = false"
-      >
+      <v-btn dark text v-bind="attrs" :color="toast.sclass">
+        <!-- @click="toast.show = false" -->
         <v-icon left>{{ toast.icon }}</v-icon> &nbsp; Close
       </v-btn>
     </template>
