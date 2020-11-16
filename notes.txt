@@ -1,4 +1,11 @@
 -----------------------------
+SECTION: Big Project Ideas
+-----------------------------
+Event centers & other special listings 
+Admin section 
+
+
+-----------------------------
 SECTION: Project Overview 
 -----------------------------
   Bunkee is an app that helps 4 kinds of people 

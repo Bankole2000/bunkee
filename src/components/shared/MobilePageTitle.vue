@@ -80,7 +80,9 @@ export default {
   },
   computed: {
     showPage() {
-      return this.$route.name == 'Verify' ? true : false;
+      return this.$route.name == 'Verify' || this.$route.name == 'Profile'
+        ? true
+        : false;
     },
   },
 };

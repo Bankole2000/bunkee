@@ -139,7 +139,7 @@
           ><v-icon left size="20">mdi-cash</v-icon> &#8358;150k</v-chip
         >
         <v-spacer></v-spacer>
-        <v-btn color="primary" text class="mx-1 rounded-xl">
+        <v-btn @click="goToOffer" color="primary" text class="mx-1 rounded-xl">
           More <v-icon right>mdi-menu-right</v-icon>
         </v-btn>
       </div>
@@ -152,16 +152,16 @@
           :color="show ? 'primary' : ''"
           class="rounded-xl"
           width="23%"
-          @click="show = !show"
+          @click="toggleComments"
           ><v-icon left>mdi-chat-outline</v-icon>5</v-btn
         >
-        <v-btn text width="23%" large class="rounded-xl"
+        <v-btn @click="sendInvite" text width="23%" large class="rounded-xl"
           ><v-icon left>mdi-send</v-icon>89</v-btn
         >
-        <v-btn text width="23%" large class="rounded-xl"
-          ><v-icon left>mdi-share</v-icon>89</v-btn
+        <v-btn @click="share" text width="23%" large class="rounded-xl"
+          ><v-icon left>mdi-share-variant</v-icon>89</v-btn
         >
-        <v-btn text width="23%" large class="rounded-xl"
+        <v-btn @click="like" text width="23%" large class="rounded-xl"
           ><v-icon left>mdi-heart-outline</v-icon>89</v-btn
         >
       </v-card-text>
@@ -177,7 +177,7 @@
             <p
               class="my-4 font-weight-medium primary--text"
               style="cursor: pointer;"
-              @click="() => {}"
+              @click="getPreviousComments"
             >
               View previous comments
             </p>
@@ -353,6 +353,36 @@ export default {
     return {
       show: false,
     };
+  },
+  methods: {
+    share() {
+      console.log(navigator);
+      const url = 'https://google.com';
+      if (navigator.share) {
+        navigator
+          .share({
+            title: 'Sharing Something',
+            url,
+          })
+          .then(() => console.log('Thanks for sharing'));
+      }
+    },
+    like() {
+      console.log('liked');
+    },
+    sendInvite() {
+      console.log('Send Invite');
+    },
+    goToOffer() {
+      console.log('Go to offer page');
+    },
+    toggleComments() {
+      this.show = !this.show;
+      console.log(`${this.show ? 'Show Comments' : 'Hide Comments'}`);
+    },
+    getPreviousComments() {
+      console.log('Get more comments');
+    },
   },
 };
 </script>

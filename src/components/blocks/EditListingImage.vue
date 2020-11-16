@@ -12,8 +12,8 @@
             small
             fab
             color="primary"
-            @click="imageCropModal = true"
             class="mx-2"
+            @click="imageCropModal = true"
           >
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
@@ -87,7 +87,8 @@
             canvas-color="transparent"
             :quality="2"
             v-model="croppa"
-          ></croppa>
+          >
+          </croppa>
         </v-card-text>
         <v-expand-transition>
           <v-card-text v-show="imageSelected" class="py-0"
@@ -160,12 +161,12 @@
 <script>
 import { mapActions } from 'vuex';
 export default {
-  props: ['index'],
+  props: ['index', 'listingImageToEdit'],
   data() {
     return {
-      uploadedImage: null,
+      uploadedImage: this.listingImageToEdit.imageFullsizeUrl,
       uploadingImage: false,
-      userGivenName: '',
+      userGivenName: this.listingImageToEdit.userGivenName,
       imageCropModal: false,
       listingImage: null,
       croppa: {},
@@ -184,7 +185,8 @@ export default {
     ...mapActions(['uploadListingImage', 'showToast', 'deleteListingImage']),
     deleteImage() {
       // this.imageCropModal = true;
-      this.croppa.remove();
+      console.log({ index: this.index });
+      // this.croppa.remove();
       this.uploadedImage = null;
       this.deleteListingImage({ index: this.index }).then(() => {
         this.$emit('deletedImage');

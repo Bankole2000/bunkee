@@ -6,7 +6,9 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    loading: false,
     currentUser: null,
+    currentUserListings: null,
     listingInCreation: null,
     toast: {
       sclass: '',
@@ -41,6 +43,20 @@ export default new Vuex.Store({
     },
   },
   mutations: {
+    setLoading(state, payload) {
+      state.loading = payload.loading;
+    },
+    removeListingFromCurrentUserListings(state, payload) {
+      state.currentUserListings.splice(
+        state.currentUserListings.findIndex(
+          (listing) => listing.id === payload.listingId
+        ),
+        1
+      );
+    },
+    setCurrentUserListings(state, payload) {
+      state.currentUserListings = payload;
+    },
     setListingInCreation(state, payload) {
       state.listingInCreation = {};
       for (const key in payload) {
@@ -89,9 +105,85 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    async setLoading({ commit }, payload) {
+      const { loading } = payload;
+      commit('setLoading', { loading });
+    },
+    async deleteOwnListing({ commit, state }, payload) {
+      const listingToDelete = state.currentUserListings.find((listing) => {
+        return (
+          listing.id == payload.listingId &&
+          listing.ownerId == state.currentUser.id
+        );
+      });
+      if (listingToDelete) {
+        console.log(listingToDelete);
+        const res = await fetch(
+          `${config.serverURL}/listings/${payload.listingId}`,
+          {
+            method: 'DELETE',
+            headers: {
+              Authorization: `Bearer ${state.currentUser.token}`,
+            },
+          }
+        );
+        const data = await res.json();
+        console.log(data, res, payload);
+        if (data.hasErrors) {
+          return false;
+        } else {
+          commit('removeListingFromCurrentUserListings', {
+            listingId: payload.listingId,
+          });
+          commit('showToast', {
+            sclass: 'info',
+            message: 'Listing Deleted',
+            timeout: 1500,
+          });
+          return true;
+        }
+      } else {
+        console.log(listingToDelete);
+        return false;
+      }
+    },
+    async getCurrentUserListings({ commit, state }) {
+      const res = await fetch(
+        `${config.serverURL}/user/${state.currentUser.username}/listings`,
+        {
+          method: 'GET',
+        }
+      );
+      const data = await res.json();
+      console.log(data, res);
+      commit('setCurrentUserListings', data.listings);
+    },
+    async deleteListingImage({ commit, state }, payload) {
+      const res = await fetch(
+        `${config.serverURL}/listings/${state.listingInCreation.listing.id}/listingimage/${payload.index}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${state.currentUser.token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      console.log(data, res);
+      if (data.hasErrors) {
+        commit('showToast', {
+          sclass: 'error',
+          message: data.errors[0].message,
+          timeout: 1500,
+        });
+      } else {
+        commit('setListingInCreation', data);
+      }
+    },
     async uploadListingImage({ commit, state }, payload) {
       const formData = new FormData();
       formData.append('listingImage', payload.listingImage);
+      formData.append('userGivenName', payload.userGivenName);
       formData.append('index', payload.index);
       let requestOptions = {
         method: 'POST',
@@ -101,7 +193,7 @@ export default new Vuex.Store({
         body: formData,
       };
       const res = await fetch(
-        `${config.serverURL}/listings/listingimage`,
+        `${config.serverURL}/listings/${state.listingInCreation.listing.id}/listingimage`,
         requestOptions
       );
       const data = await res.json();
@@ -112,6 +204,7 @@ export default new Vuex.Store({
       //   }, function (error) {
       //     console.log(error);
       //   });
+      commit('setListingInCreation', data);
     },
     async updateListingInCreation({ commit, state }, payload) {
       const dataToUpdate = [];
@@ -150,6 +243,39 @@ export default new Vuex.Store({
       const data = await res.json();
       commit('setListingInCreation', data);
       console.log(data, res);
+    },
+    async getListingInCreation({ commit, state }, payload) {
+      const res = await fetch(
+        `${config.serverURL}/listings/${payload.listingId}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${state.currentUser.token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      console.log(data, res);
+      if (data.hasErrors) {
+        commit('showToast', {
+          sclass: 'error',
+          message: data.errors[0].message,
+          timeout: 1500,
+        });
+        return false;
+      } else {
+        if (data.listing.ownerId !== state.currentUser.id) {
+          commit('showToast', {
+            sclass: 'error',
+            message: 'You don not own this listing',
+            timeout: 1500,
+          });
+          return false;
+        } else {
+          commit('setListingInCreation', data);
+          return true;
+        }
+      }
     },
     setUser({ commit }, payload) {
       commit('setUser', payload);
@@ -198,6 +324,9 @@ export default new Vuex.Store({
     },
   },
   getters: {
+    currentUserListings(state) {
+      return state.currentUserListings;
+    },
     toast(state) {
       return state.toast;
     },
@@ -206,6 +335,9 @@ export default new Vuex.Store({
     },
     alert(state) {
       return state.alert;
+    },
+    loading(state) {
+      return state.loading;
     },
     loggedInUser(state) {
       return state.currentUser;

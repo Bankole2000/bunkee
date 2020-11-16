@@ -1,6 +1,11 @@
 <template>
   <div class="create-listing-form">
-    <v-progress-linear :value="percentComplete" rounded striped height="25">
+    <v-progress-linear
+      :value="listingInCreation.listing.percentComplete"
+      rounded
+      striped
+      height="25"
+    >
       <template v-slot="{ value }">
         <strong>{{ Math.ceil(value) }}% Complete</strong>
       </template>
@@ -174,23 +179,72 @@
           <v-window-item :value="3">
             <v-row :class="{ 'pt-2': $vuetify.breakpoint.height > 618 }">
               <v-col cols="12" sm="6">
-                <AddListingImage
+                <EditListingImage
+                  :listingImageToEdit="
+                    listingData.listingImages.find(
+                      (image) => image.listingOrder == 1
+                    )
+                  "
                   :index="1"
                   @savedImage="mainImageSaved"
                   @deletedImage="mainImageDeleted"
                 />
               </v-col>
 
+              <v-col
+                cols="12"
+                sm="6"
+                v-for="extraListingImage in extraListingImages"
+                :key="extraListingImage.id"
+              >
+                <EditListingImage
+                  :listingImageToEdit="extraListingImage"
+                  :index="extraListingImage.listingOrder"
+                  @savedImage="oldImageSaved"
+                  @deletedImage="oldImageDeleted"
+                />
+              </v-col>
               <v-col cols="12" sm="6" v-for="n in noOfExtraImages + 1" :key="n">
                 <AddListingImage
-                  :index="n + 1"
-                  @savedImage="imageSaved"
-                  @deletedImage="imageDeleted"
+                  :index="
+                    Math.max.apply(
+                      Math,
+                      listingInCreation.listing.listingImages.map(
+                        (image) => image.listingOrder
+                      )
+                    ) + 1
+                  "
+                  @savedImage="newImageSaved"
+                  @deletedImage="newImageDeleted"
                 />
               </v-col>
             </v-row>
           </v-window-item>
-          <v-window-item :value="4"> {{ step }}</v-window-item>
+          <v-window-item :value="4">
+            <v-row :class="{ 'pt-2': $vuetify.breakpoint.height > 618 }">
+              <v-col cols="12">
+                <p class="text-h5 font-weight-black black--text mb-0">
+                  So Far So Good
+                </p>
+                <v-divider></v-divider>
+                <v-expansion-panels accordion focusable>
+                  <v-expansion-panel v-for="(item, i) in information" :key="i">
+                    <v-expansion-panel-header>{{
+                      item.title
+                    }}</v-expansion-panel-header>
+                    <v-expansion-panel-content>
+                      {{ item.text }}
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-expansion-panels>
+              </v-col>
+              <v-col cols="12" class="px-4"
+                ><v-btn large class="accent" block
+                  ><v-icon left>mdi-pause</v-icon> Pause For now</v-btn
+                ></v-col
+              >
+            </v-row>
+          </v-window-item>
           <v-window-item :value="5"> {{ step }}</v-window-item>
           <v-window-item :value="6"> {{ step }}</v-window-item>
           <v-window-item :value="7"> {{ step }}</v-window-item>
@@ -218,12 +272,14 @@
           :disabled="
             step == totalNoOfSteps + 1 ||
               moving ||
-              (noOfExtraImages == 0 && step == 3) ||
+              (listingInCreation.listing.listingImages.length < 2 &&
+                step == 3) ||
               (!mainImageUploaded && step == 3)
           "
           color="primary"
           @click="moveToNextStep(step)"
         >
+          <v-icon left v-if="step == 4">mdi-play</v-icon>
           <span v-if="step != 4 || step == totalNoOfSteps + 1">Next</span>
           <span v-if="step == 4">Save & Continue</span>
         </v-btn>
@@ -237,6 +293,7 @@ import Cities from '../helpers/cities.json';
 import Countries from '../helpers/countries.json';
 import States from '../helpers/states.json';
 import Alert from '../shared/Alert';
+import EditListingImage from '../blocks/EditListingImage';
 import AddListingImage from '../blocks/AddListingImage';
 import { mapActions, mapGetters } from 'vuex';
 import { allRegexes } from '../helpers/config';
@@ -244,17 +301,21 @@ import { allRegexes } from '../helpers/config';
 export default {
   components: {
     Alert,
+    EditListingImage,
     AddListingImage,
   },
+  props: ['listingData'],
   data() {
     return {
-      mainImageUploaded: false,
+      mainImageUploaded: this.listingData.listingImages.some(
+        (image) => image.listingOrder == 1
+      ),
       noOfExtraImages: 0,
-      listingTitle: '',
+      listingTitle: this.listingData.title,
       imageCropModal: false,
       croppa: {},
-      listingBriefDescription: '',
-      typeOfPlace: '',
+      listingBriefDescription: this.listingData.description,
+      typeOfPlace: this.listingData.buildingType,
       typeOfPlaceOptions: [
         'Serviced Apartment',
         'Self Contain',
@@ -264,25 +325,53 @@ export default {
         'Face Me I Face You',
         'Boutique Hotel',
       ],
-      typeOfListing: '',
+      typeOfListing: this.listingData.typeOfListing,
       typeOfListingOptions: ['Entire Place', 'Private Room', 'Shared Room'],
       noOfGuestsOptions: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-      noOfGuests: '',
+      noOfGuests: this.listingData.guestCapacity,
       enterCustomCityName: false,
       enterCustomPlaceType: false,
       Countries,
       States,
       Cities,
-      selectedCountry: {},
-      selectedCity: {},
-      enteredCustomCityName: '',
+      selectedCountry: Countries.find(
+        (country) => country.name == this.listingData.locationCountry
+      ),
+      selectedCity: Cities.find(
+        (city) => city.name == this.listingData.locationCity
+      ),
+      enteredCustomCityName: this.listingData.locationCity,
       city: '',
-      selectedState: {},
+      selectedState: States.find(
+        (state) => state.name == this.listingData.locationState
+      ),
       state: null,
       noChecks: false,
       step: 1,
       totalNoOfSteps: 7,
       moving: false,
+      information: [
+        {
+          title: 'Information you will need',
+          text: `Here's some info you might need`,
+        },
+        {
+          title: 'Information you will need',
+          text: `Here's some info you might need`,
+        },
+        {
+          title: 'Information you will need',
+          text: `Here's some info you might need`,
+        },
+        {
+          title: 'Information you will need',
+          text: `Here's some info you might need`,
+        },
+        {
+          title: 'Information you will need',
+          text: `Here's some info you might need`,
+        },
+      ],
     };
   },
 
@@ -318,7 +407,7 @@ export default {
         this.mainImageUploaded = false;
       });
     },
-    imageSaved(e) {
+    newImageSaved(e) {
       console.log('image Saved', e);
       this.noOfExtraImages++;
       this.showToast({
@@ -327,9 +416,25 @@ export default {
         timeout: 1500,
       });
     },
-    imageDeleted(e) {
+    oldImageSaved(e) {
+      console.log('image Saved', e);
+      this.showToast({
+        sclass: 'success',
+        message: 'Image uploaded',
+        timeout: 1500,
+      });
+    },
+    newImageDeleted(e) {
       console.log('image Deleted', e);
       this.noOfExtraImages--;
+      this.showToast({
+        sclass: 'info',
+        message: 'Image deleted',
+        timeout: 1500,
+      });
+    },
+    oldImageDeleted(e) {
+      console.log('image Deleted', e);
       this.showToast({
         sclass: 'info',
         message: 'Image deleted',
@@ -404,8 +509,23 @@ export default {
         console.log(step);
         const moveToStepTwo = this.checkStep1();
         if (moveToStepTwo.move) {
-          this.moving = false;
-          this.step++;
+          let newCity =
+            this.selectedCity.name === undefined
+              ? this.selectedCity
+              : this.selectedCity.name;
+          this.updateListingInCreation({
+            id: this.listingInCreation.listing.id,
+            typeOfListing: this.typeOfListing,
+            locationCountry: this.selectedCountry.name,
+            locationState: this.selectedState.name,
+            guestCapacity: this.noOfGuests,
+            locationCity: this.enterCustomCityName
+              ? this.enteredCustomCityName
+              : newCity,
+          }).then(() => {
+            this.step++;
+            this.moving = false;
+          });
         } else {
           this.showAlert({
             aclass: 'error',
@@ -428,46 +548,19 @@ export default {
         const moveToStepThree = this.checkStep2();
 
         if (moveToStepThree.move) {
-          if (this.listingInCreation) {
-            this.updateListingInCreation({
-              id: this.listingInCreation.listing.id,
-              title: this.listingTitle,
-              description: this.listingBriefDescription,
-              // "isPrivate": false,
-              locationState: this.selectedState.name,
-              locationCountry: this.selectedCountry.name,
-              locationCity: this.enterCustomCityName
-                ? this.enteredCustomCityName
-                : this.selectedCity,
-              guestCapacity: this.noOfGuests,
-              // "isPublished":false,
-              buildingType: this.typeOfPlace,
-              typeOfListing: this.typeOfListing,
-              percentComplete: this.percentComplete,
-            }).then(() => {
-              this.moving = false;
-              this.step++;
-            });
-          } else {
-            this.setListingInCreation({
-              title: this.listingTitle,
-              description: this.listingBriefDescription,
-              // "isPrivate": false,
-              locationState: this.selectedState.name,
-              locationCountry: this.selectedCountry.name,
-              locationCity: this.enterCustomCityName
-                ? this.enteredCustomCityName
-                : this.selectedCity,
-              guestCapacity: this.noOfGuests,
-              // "isPublished":false,
-              buildingType: this.typeOfPlace,
-              typeOfListing: this.typeOfListing,
-              percentComplete: this.percentComplete,
-            }).then(() => {
-              this.moving = false;
-              this.step++;
-            });
-          }
+          this.updateListingInCreation({
+            id: this.listingInCreation.listing.id,
+            title: this.listingTitle,
+            description: this.listingBriefDescription,
+            // "isPrivate": false,
+            // "isPublished":false,
+            buildingType: this.typeOfPlace,
+            typeOfListing: this.typeOfListing,
+            percentComplete: this.percentComplete,
+          }).then(() => {
+            this.moving = false;
+            this.step++;
+          });
         } else {
           this.showAlert({
             aclass: 'error',
@@ -479,12 +572,22 @@ export default {
         }
       }
       if (step == 3) {
-        this.step++;
-        this.moving = false;
+        this.updateListingInCreation({
+          id: this.listingInCreation.listing.id,
+          percentComplete: this.percentComplete,
+        }).then(() => {
+          this.step++;
+          this.moving = false;
+        });
       }
       if (step == 4) {
-        this.step++;
-        this.moving = false;
+        this.updateListingInCreation({
+          id: this.listingInCreation.listing.id,
+          percentComplete: this.percentComplete,
+        }).then(() => {
+          this.step++;
+          this.moving = false;
+        });
       }
       if (step == 5) {
         this.step++;
@@ -507,6 +610,12 @@ export default {
 
   computed: {
     ...mapGetters(['listingInCreation']),
+    extraListingImages() {
+      let extraListingImages = this.listingInCreation.listing.listingImages.filter(
+        (image) => image.listingOrder > 1
+      );
+      return extraListingImages;
+    },
     currentTitle() {
       switch (this.step) {
         case 1:
