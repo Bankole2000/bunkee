@@ -6,6 +6,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    connected: null,
     loading: false,
     currentUser: null,
     currentUserListings: null,
@@ -43,6 +44,22 @@ export default new Vuex.Store({
     },
   },
   mutations: {
+    SOCKET_CONNECT(state) {
+      console.log('socket disconnected');
+      state.connected = true;
+    },
+    SOCKET_DISCONNECT(state) {
+      state.connected = false;
+    },
+    SOCKET_MESSAGE(state, message) {
+      state.message = message;
+    },
+    SOCKET_HELLO_WORLD(state, message) {
+      state.message = message;
+    },
+    SOCKET_ERROR(state, message) {
+      state.error = message.error;
+    },
     setLoading(state, payload) {
       state.loading = payload.loading;
     },
@@ -105,6 +122,13 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    SOCKET_CONNECT({ commit }) {
+      console.log('socket disconnected');
+      commit('SOCKET_CONNECT');
+    },
+    SOCKET_NEWLOGIN({ commit }, payload) {
+      console.log(payload, { commit });
+    },
     async setLoading({ commit }, payload) {
       const { loading } = payload;
       commit('setLoading', { loading });
@@ -246,7 +270,7 @@ export default new Vuex.Store({
     },
     async getListingInCreation({ commit, state }, payload) {
       const res = await fetch(
-        `${config.serverURL}/listings/${payload.listingId}`,
+        `${config.serverURL}/listings/listing/${payload.listingId}`,
         {
           method: 'GET',
           headers: {

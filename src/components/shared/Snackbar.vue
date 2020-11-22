@@ -6,7 +6,8 @@
     :right="!$vuetify.breakpoint.smAndDown"
     :timeout="toast.timeout"
   >
-    {{ toast.message }}
+    <p v-html="toast.message" class="mb-0"></p>
+    <!-- {{ toast.message }} -->
 
     <template v-slot:action="{ attrs }">
       <v-btn dark text v-bind="attrs" :color="toast.sclass">

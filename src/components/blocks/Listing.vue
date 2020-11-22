@@ -66,9 +66,10 @@
           <div class="d-flex align-center text-h6 font-weight-light">
             <div>
               <v-card-subtitle class="py-0 px-0"
-                >Listing Title - e.g. My little getaway</v-card-subtitle
+                >Listing Title - e.g. My little getaway &middot;
+                State</v-card-subtitle
               >
-              2 Bedroom Flat &middot; Abuja
+              2 Bedroom Flat &middot; City
             </div>
             <v-spacer> </v-spacer>
             <v-btn icon><v-icon>mdi-information</v-icon></v-btn>
@@ -225,6 +226,7 @@ export default {
     },
     like() {
       console.log('Like listing - Add listing to favorites');
+      this.$socket.emit('like', { message: 'like' });
     },
   },
 };

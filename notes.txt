@@ -493,3 +493,125 @@ Menu options:
 10. Support / Feedback,
 11. Help & Info,
 12. Transactions,
+
+
+Socket.io notes 
+SERVER SIDE
+// sends to the single specific socket connecting
+socket.emit('event', {data})
+
+// sends to all except specific socket
+socket.broadcast.emit('event', {data})
+
+// sends to all connected clients sockets
+io.emit('event', {data})
+
+// Runs on client disconnect
+socket.on('disconnect', (data) => {})  
+
+
+
+//// Traversy media example 
+#region
+const botName = 'ChatCord Bot';
+
+// Run when client connects
+io.on('connection', (socket) => {
+  socket.on('joinRoom', ({ username, room }) => {
+    const user = userJoin(socket.id, username, room);
+
+    socket.join(user.room);
+
+    // Welcome current user
+    socket.emit('message', formatMessage(botName, 'Welcome to ChatCord!'));
+
+    // Broadcast when a user connects
+    socket.broadcast
+      .to(user.room)
+      .emit(
+        'message',
+        formatMessage(botName, `${user.username} has joined the chat`)
+      );
+
+    // Send users and room info
+    io.to(user.room).emit('roomUsers', {
+      room: user.room,
+      users: getRoomUsers(user.room),
+    });
+  });
+
+  // Listen for chatMessage
+  socket.on('chatMessage', (msg) => {
+    const user = getCurrentUser(socket.id);
+
+    io.to(user.room).emit('message', formatMessage(user.username, msg));
+  });
+
+  // Runs when client disconnects
+  socket.on('disconnect', () => {
+    const user = userLeave(socket.id);
+
+    if (user) {
+      io.to(user.room).emit(
+        'message',
+        formatMessage(botName, `${user.username} has left the chat`)
+      );
+
+      // Send users and room info
+      io.to(user.room).emit('roomUsers', {
+        room: user.room,
+        users: getRoomUsers(user.room),
+      });
+    }
+  });
+});
+#endregion
+
+// Vue Vuex Sockets example
+// In component 
+export default {
+  data () {
+    return {
+      message: '',
+      response: 'Server has not yet replied.'
+    }
+  },
+  methods: {
+    emitEvent () {
+      this.$socket.emit('hello_world', this.message)
+    }
+  },
+  created () {
+    this.$options.sockets.hello_world = (data) => {
+      this.response = data
+    }
+  }
+}
+
+First, we have to initialize the listener — this is done in the created lifecycle hook so as soon as our component is created, it will begin listening. We then a key on the this.$options.sockets object to a callback function. This sockets object tracks all of our listeners. Under the hood, Vue-SocketIO reads all of the values in this object and registers listeners. Similarly, when a listener is deleted, it unregisters the listener.
+
+export default new Vuex.Store({
+  state: {
+    connected: false,
+    error: '',
+    message: '',
+  },
+  mutations: {
+    SOCKET_CONNECT(state) {
+      state.connected = true
+    },
+    SOCKET_DISCONNECT(state) {
+      state.connected = false
+    },
+    SOCKET_MESSAGE(state, message) {
+      state.message = message
+    },
+    SOCKET_HELLO_WORLD(state, message) {
+      state.message = message
+    },
+    SOCKET_ERROR(state, message) {
+      state.error = message.error
+    },
+  },
+})
+Registering a listener using Vuex is as simple as adding a mutation prefixed with SOCKET_. The text after this prefix is the name of our channel we want to listen to. To convert the listener from our previous example, which listened on the channel hello_world, we simply create a mutation named SOCKET_HELLO_WORLD. Our server’s response to our message can now be shared with our other components!

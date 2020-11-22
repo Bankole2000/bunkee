@@ -91,7 +91,7 @@ export default {
   //   },
   // },
   mounted() {
-    console.log(this.$vuetify.breakpoint);
+    // console.log(this.$vuetify.breakpoint);
   },
 };
 </script>

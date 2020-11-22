@@ -1,94 +1,118 @@
 <template>
-  <div class="mobile-profile-modal">
-    <v-dialog
-      v-model="dialog"
-      fullscreen
-      hide-overlay
-      transition="dialog-bottom-transition"
+  <v-dialog
+    v-model="dialog"
+    max-width="375"
+    :fullscreen="$vuetify.breakpoint.smAndDown"
+    hide-overlay
+    transition="dialog-bottom-transition"
+    :class="{ 'rounded-xl': $vuetify.breakpoint.mdAndUp }"
+  >
+    <template v-slot:activator="{ on, attrs }">
+      <v-list-item-avatar color="grey" v-bind="attrs" v-on="on">
+        <v-img src="https://cdn.vuetifyjs.com/images/lists/5.jpg"></v-img>
+      </v-list-item-avatar>
+    </template>
+    <v-card
+      max-width="375"
+      class="mx-auto"
+      :class="{ 'rounded-xl': $vuetify.breakpoint.mdAndUp }"
     >
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn color="primary" dark v-bind="attrs" v-on="on">
-          Open Dialog
-        </v-btn>
-      </template>
-      <v-card>
-        <v-card-title>
-          <v-btn icon @click="dialog = false">
-            <v-icon>mdi-close</v-icon>
-          </v-btn>
-          User Profile
-          <v-spacer></v-spacer>
-          <v-toolbar-items>
-            <v-btn text @click="dialog = false">Save</v-btn>
-          </v-toolbar-items>
-        </v-card-title>
+      <v-img
+        src="https://cdn.vuetifyjs.com/images/lists/ali.png"
+        height="300px"
+        dark
+      >
+        <v-row class="fill-height">
+          <v-card-title>
+            <v-btn dark icon @click="dialog = false">
+              <v-icon>mdi-chevron-left</v-icon>
+            </v-btn>
 
-        <v-card-text>
-          <v-list three-line subheader>
-            <v-subheader>User Controls</v-subheader>
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>Content filtering</v-list-item-title>
-                <v-list-item-subtitle
-                  >Set the content filtering level to restrict apps that can be
-                  downloaded</v-list-item-subtitle
-                >
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>Password</v-list-item-title>
-                <v-list-item-subtitle
-                  >Require password for purchase or use password to restrict
-                  purchase</v-list-item-subtitle
-                >
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-          <v-divider></v-divider>
-          <v-list three-line subheader>
-            <v-subheader>General</v-subheader>
-            <v-list-item>
-              <v-list-item-action>
-                <v-checkbox v-model="notifications"></v-checkbox>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Notifications</v-list-item-title>
-                <v-list-item-subtitle
-                  >Notify me about updates to apps or games that I
-                  downloaded</v-list-item-subtitle
-                >
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-action>
-                <v-checkbox v-model="sound"></v-checkbox>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Sound</v-list-item-title>
-                <v-list-item-subtitle
-                  >Auto-update apps at any time. Data charges may
-                  apply</v-list-item-subtitle
-                >
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-action>
-                <v-checkbox v-model="widgets"></v-checkbox>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Auto-add widgets</v-list-item-title>
-                <v-list-item-subtitle
-                  >Automatically add home screen widgets</v-list-item-subtitle
-                >
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-        </v-card-text>
-        <v-card-actions> </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </div>
+            <v-spacer></v-spacer>
+
+            <v-btn dark icon class="mr-4">
+              <v-icon>mdi-pencil</v-icon>
+            </v-btn>
+
+            <v-btn dark icon>
+              <v-icon>mdi-dots-vertical</v-icon>
+            </v-btn>
+          </v-card-title>
+
+          <v-spacer></v-spacer>
+
+          <v-card-title class="white--text pl-12 pt-12">
+            <div class="display-1 pl-12 pt-12">Ali Conners</div>
+          </v-card-title>
+        </v-row>
+      </v-img>
+
+      <v-list two-line>
+        <v-list-item>
+          <v-list-item-icon>
+            <v-icon color="indigo">mdi-phone</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>(650) 555-1234</v-list-item-title>
+            <v-list-item-subtitle>Mobile</v-list-item-subtitle>
+          </v-list-item-content>
+
+          <v-list-item-icon>
+            <v-icon>mdi-message-text</v-icon>
+          </v-list-item-icon>
+        </v-list-item>
+
+        <v-list-item>
+          <v-list-item-action></v-list-item-action>
+
+          <v-list-item-content>
+            <v-list-item-title>(323) 555-6789</v-list-item-title>
+            <v-list-item-subtitle>Work</v-list-item-subtitle>
+          </v-list-item-content>
+
+          <v-list-item-icon>
+            <v-icon>mdi-message-text</v-icon>
+          </v-list-item-icon>
+        </v-list-item>
+
+        <v-divider inset></v-divider>
+
+        <v-list-item>
+          <v-list-item-icon>
+            <v-icon color="indigo">mdi-email</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>aliconnors@example.com</v-list-item-title>
+            <v-list-item-subtitle>Personal</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-list-item>
+          <v-list-item-action></v-list-item-action>
+
+          <v-list-item-content>
+            <v-list-item-title>ali_connors@example.com</v-list-item-title>
+            <v-list-item-subtitle>Work</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+
+        <v-divider inset></v-divider>
+
+        <v-list-item>
+          <v-list-item-icon>
+            <v-icon color="indigo">mdi-map-marker</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title>1400 Main Street</v-list-item-title>
+            <v-list-item-subtitle>Orlando, FL 79938</v-list-item-subtitle>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script>

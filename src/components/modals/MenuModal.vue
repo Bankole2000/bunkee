@@ -18,7 +18,7 @@
         <v-divider></v-divider>
         <v-card-text style="height: 300px;" class="pb-0">
           <v-row class="text-center mt-6">
-            <v-col cols="6" @click="goTo('/user/messages')">
+            <v-col cols="6" @click="logout">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img :src="require('@/assets/icons/email.svg')"></v-img>
@@ -168,7 +168,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 export default {
   data() {
     return {
@@ -179,9 +179,18 @@ export default {
     ...mapGetters(['loggedInUser']),
   },
   methods: {
+    ...mapActions(['logOut', 'showToast']),
     goTo(path) {
       this.$router.push(path);
       this.dialog = false;
+    },
+    logout() {
+      this.$socket.emit('logout', this.loggedInUser);
+      this.logOut();
+      this.showToast({
+        sclass: 'info',
+        message: 'Logged Out',
+      });
     },
   },
 };

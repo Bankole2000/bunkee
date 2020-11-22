@@ -96,7 +96,7 @@
 </template>
 
 <script>
-import colors from 'vuetify/lib/util/colors';
+// import colors from 'vuetify/lib/util/colors';
 import { config } from '../helpers/config';
 import LoginForm from '../forms/Login';
 
@@ -110,8 +110,8 @@ export default {
     };
   },
   created() {
-    console.log('test', colors);
-    console.log(this.$vuetify);
+    // console.log('test', colors);
+    // console.log(this.$vuetify);
   },
 
   computed: {},

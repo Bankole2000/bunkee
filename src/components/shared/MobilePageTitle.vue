@@ -60,6 +60,7 @@
 import MenuModal from '../modals/MenuModal';
 import ChatModal from '../modals/MobileChatModal';
 import Notifications from '../modals/Notifications';
+// import { mapActions, mapGetters } from 'vuex';
 export default {
   components: {
     ChatModal,
@@ -79,11 +80,15 @@ export default {
     };
   },
   computed: {
+    // ...mapGetters(['loggedInUser']),
     showPage() {
       return this.$route.name == 'Verify' || this.$route.name == 'Profile'
         ? true
         : false;
     },
+  },
+  methods: {
+    // ...mapActions(['logout']),
   },
 };
 </script>

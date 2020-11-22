@@ -40,6 +40,7 @@
       <v-btn text class="text-capitalize" v-if="$vuetify.breakpoint.mdAndUp"
         >Become A Host</v-btn
       >
+      <ChatModal />
       <v-btn
         v-if="$route.path != '/login' && $route.path != '/signup'"
         icon
@@ -205,10 +206,12 @@ import { mapGetters, mapActions } from 'vuex';
 import { config } from '../helpers/config';
 import LoginModal from '../modals/LoginModal';
 import SignupModal from '../modals/SignupModal';
+import ChatModal from '../modals/MobileChatModal';
 export default {
   components: {
     LoginModal,
     SignupModal,
+    ChatModal,
   },
   data() {
     return {
@@ -225,6 +228,7 @@ export default {
   methods: {
     ...mapActions(['logOut', 'showToast']),
     logout() {
+      this.$socket.emit('logout', this.loggedInUser);
       this.logOut();
       this.showToast({
         sclass: 'info',

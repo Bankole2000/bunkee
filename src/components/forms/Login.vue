@@ -147,6 +147,7 @@ export default {
           const geoRes = await fetch('http://www.geoplugin.net/json.gp');
           const geoData = await geoRes.json();
           console.log(geoRes, geoData);
+          this.$socket.emit('login', { user: data.user });
         });
       }
     },
