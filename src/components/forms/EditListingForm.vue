@@ -245,7 +245,90 @@
               >
             </v-row>
           </v-window-item>
-          <v-window-item :value="5"> {{ step }}</v-window-item>
+          <v-window-item :value="5">
+            <p class="text-h6 font-weight-light mb-0">
+              What Amenities will your guests have?
+            </p>
+            <!-- <v-col cols="12">
+              <v-select
+                v-model="selectedAmenities"
+                :items="amenities"
+                attach
+                chips
+                placeholder="Select Amenities"
+                label="Amenities"
+                outlined
+                multiple
+                tags
+                ref="amenitySelect"
+                @input="selectAmenity($event)"
+              ></v-select>
+            </v-col>
+            <div v-for="(amenity, i) in selectedAmenities" :key="i">
+              <v-row class="d-flex align-center ">
+                <v-col cols="6" class="text-center">
+                  <p class="text-h6 font-weight-light mb-8">{{ amenity }}:</p>
+                </v-col>
+                <v-col class="grow" cols="6">
+                  <v-text-field
+                    v-model="amenityDescriptions[i]"
+                    dense
+                    outlined
+                    :label="`describe`"
+                  >
+                  </v-text-field>
+                </v-col>
+              </v-row>
+            </div> -->
+            <v-card elevation="0">
+              <v-card-text class="pa-0">
+                <v-slide-y-transition group>
+                  <v-card
+                    v-for="(amenity, i) in amenitiesData"
+                    :key="i"
+                    class="rounded-xl my-2"
+                  >
+                    <v-card-title class="primary py-2"
+                      ><p class="mb-0 text-h5 font-weight-light">
+                        Amenity No {{ i + 1 }}
+                      </p>
+                      <v-spacer></v-spacer
+                      ><v-btn @click="removeAmenity(i)" small color="error" fab>
+                        <v-icon>mdi-close</v-icon>
+                      </v-btn></v-card-title
+                    >
+                    <v-card-text class="py-4 pb-0">
+                      <v-select
+                        :items="amenities"
+                        :value="listingInCreation.listing.amenities[i].amenity"
+                        label="Amenity"
+                        outlined
+                        v-model="amenitiesData[i].amenity"
+                      >
+                      </v-select>
+                      <v-expand-transition>
+                        <v-text-field
+                          v-show="amenitiesData[i].amenity != ''"
+                          v-model="amenitiesData[i].description"
+                          :value="
+                            listingInCreation.listing.amenities[i].description
+                          "
+                          outlined
+                          label="description"
+                        ></v-text-field>
+                      </v-expand-transition>
+                    </v-card-text>
+                  </v-card>
+                </v-slide-y-transition>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn @click="addAmenity" class="px-4 my-4"
+                  ><v-icon>mdi-plus</v-icon> Add an Amenity</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </v-window-item>
           <v-window-item :value="6"> {{ step }}</v-window-item>
           <v-window-item :value="7"> {{ step }}</v-window-item>
           <v-window-item :value="8"> {{ step }}</v-window-item>
@@ -274,7 +357,8 @@
               moving ||
               (listingInCreation.listing.listingImages.length < 2 &&
                 step == 3) ||
-              (!mainImageUploaded && step == 3)
+              (!mainImageUploaded && step == 3) ||
+              (step == 5 && !amenitiesDataIsOkay)
           "
           color="primary"
           @click="moveToNextStep(step)"
@@ -307,6 +391,18 @@ export default {
   props: ['listingData'],
   data() {
     return {
+      amenityDescriptions: [],
+      amenitiesData: [],
+      amenities: [
+        'TV',
+        'Wifi/Internet',
+        'Air Conditioner',
+        'Water Supply',
+        'Power Supply',
+        'Laundry',
+        'Toiletries',
+      ],
+      selectedAmenities: [],
       mainImageUploaded: this.listingData.listingImages.some(
         (image) => image.listingOrder == 1
       ),
@@ -374,7 +470,6 @@ export default {
       ],
     };
   },
-
   methods: {
     ...mapActions([
       'showAlert',
@@ -383,6 +478,41 @@ export default {
       'updateListingInCreation',
       'showToast',
     ]),
+    removeAmenity(i) {
+      this.amenitiesData.splice(i, 1);
+    },
+    addAmenity() {
+      this.amenitiesData.push({
+        amenity: '',
+        description: '',
+      });
+    },
+    selectAmenity(e, i) {
+      let selectedAmenities = this.amenitiesData.map(
+        (amenity) => amenity.amenity
+      );
+      console.log(e, selectedAmenities);
+      if (selectedAmenities.includes(e)) {
+        this.showToast({
+          sclass: 'error',
+          message: 'Already selected',
+          timeout: 2000,
+        });
+        this.amenitiesData[i].amenity = '';
+      }
+      // this.amenities.splice(this.amenities.indexOf(e), 1);
+      // setTimeout(() => {
+      //   this.$refs.amenitySelect.menuIsActive = false;
+      // }, 50);
+      // if (e.length > 0) {
+      //   e.forEach((amenity, index) => {
+      //     this.amenitiesData.push({
+      //       amenity,
+      //       description: this.amenityDescriptions[index],
+      //     });
+      //   });
+      // }
+    },
     uploadImage() {
       this.imageCropModal = true;
       this.croppa.chooseFile();
@@ -503,6 +633,30 @@ export default {
       }
       return { message: 'step 2 complete - Saving...', move: true };
     },
+    checkStep5() {
+      if (this.noChecks) {
+        return { message: 'No Checks', move: true };
+      }
+      if (this.amenitiesData.length < 1) {
+        return { message: 'Listing Title Too short', move: false };
+      }
+      for (let i = 0; i < this.amenitiesData.length; i++) {
+        if (!/([^\s])/.test(this.amenitiesData[i].amenity)) {
+          return { message: 'Missing Amenity name', move: false };
+        }
+        if (!/([^\s])/.test(this.amenitiesData[i].description)) {
+          return { message: 'Missing Amenity Description', move: false };
+        }
+      }
+      let uniqueAmenities = this.amenitiesData.map(
+        (amenity) => amenity.amenity
+      );
+
+      if (new Set(uniqueAmenities).size !== this.amenitiesData.length) {
+        return { message: 'Duplicate Amenities detected', move: false };
+      }
+      return { message: 'step 5 complete - Saving...', move: true };
+    },
     moveToNextStep(step) {
       this.moving = true;
       if (step == 1) {
@@ -590,8 +744,30 @@ export default {
         });
       }
       if (step == 5) {
-        this.step++;
-        this.moving = false;
+        // this.step++;
+        console.log({ data: this.amenitiesData });
+        const moveToStepSix = this.checkStep5();
+        if (moveToStepSix.move) {
+          console.log(moveToStepSix);
+          console.log('can Move');
+          this.updateListingInCreation({
+            id: this.listingInCreation.listing.id,
+            amenities: this.amenitiesData,
+            percentComplete: this.percentComplete,
+          }).then(() => {
+            this.moving = false;
+            this.step++;
+          });
+        } else {
+          console.log(moveToStepSix);
+          // console.log(JSON.stringify(this.amenitiesData));
+          this.showToast({
+            sclass: 'error',
+            message: moveToStepSix.message,
+            timeout: 2000,
+          });
+          this.moving = false;
+        }
       }
       if (step == 6) {
         this.step++;
@@ -610,6 +786,20 @@ export default {
 
   computed: {
     ...mapGetters(['listingInCreation']),
+    amenitiesDataIsOkay() {
+      // console.log(/([^\s])/.test(this.amenitiesData[0].amenity));
+      if (this.amenitiesData.length < 1) {
+        return false;
+      }
+      if (!/([^\s])/.test(this.amenitiesData[0].amenity)) {
+        return false;
+      }
+      if (!/([^\s])/.test(this.amenitiesData[0].description)) {
+        return false;
+      }
+      return true;
+    },
+
     extraListingImages() {
       let extraListingImages = this.listingInCreation.listing.listingImages.filter(
         (image) => image.listingOrder > 1
@@ -663,8 +853,19 @@ export default {
         : 'Select type of place from a list';
     },
   },
+  watch: {
+    selectedAmenities(val) {
+      console.log(val);
+      setTimeout(() => {
+        this.$refs.amenitySelect.menuIsActive = false;
+      }, 50);
+    },
+  },
+  beforeMount() {
+    this.amenitiesData = JSON.parse(this.listingInCreation.listing.amenities);
+  },
   mounted() {
-    console.log(this.$vuetify.breakpoint);
+    // console.log(this.$vuetify.breakpoint);
   },
 };
 </script>

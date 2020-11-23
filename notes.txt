@@ -511,6 +511,11 @@ socket.on('disconnect', (data) => {})
 
 
 
+Edit: This is now possible
+
+You can now simply call socket.disconnect() on the server side.
+
+
 //// Traversy media example 
 #region
 const botName = 'ChatCord Bot';
