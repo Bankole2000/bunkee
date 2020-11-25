@@ -249,37 +249,6 @@
             <p class="text-h6 font-weight-light mb-0">
               What Amenities will your guests have?
             </p>
-            <!-- <v-col cols="12">
-              <v-select
-                v-model="selectedAmenities"
-                :items="amenities"
-                attach
-                chips
-                placeholder="Select Amenities"
-                label="Amenities"
-                outlined
-                multiple
-                tags
-                ref="amenitySelect"
-                @input="selectAmenity($event)"
-              ></v-select>
-            </v-col>
-            <div v-for="(amenity, i) in selectedAmenities" :key="i">
-              <v-row class="d-flex align-center ">
-                <v-col cols="6" class="text-center">
-                  <p class="text-h6 font-weight-light mb-8">{{ amenity }}:</p>
-                </v-col>
-                <v-col class="grow" cols="6">
-                  <v-text-field
-                    v-model="amenityDescriptions[i]"
-                    dense
-                    outlined
-                    :label="`describe`"
-                  >
-                  </v-text-field>
-                </v-col>
-              </v-row>
-            </div> -->
             <v-card elevation="0">
               <v-card-text class="pa-0">
                 <v-slide-y-transition group>
@@ -300,7 +269,9 @@
                     <v-card-text class="py-4 pb-0">
                       <v-select
                         :items="amenities"
-                        :value="listingInCreation.listing.amenities[i].amenity"
+                        :value="
+                          listingInCreation.listing.amenities[i].amenity || ''
+                        "
                         label="Amenity"
                         outlined
                         v-model="amenitiesData[i].amenity"
@@ -311,7 +282,8 @@
                           v-show="amenitiesData[i].amenity != ''"
                           v-model="amenitiesData[i].description"
                           :value="
-                            listingInCreation.listing.amenities[i].description
+                            listingInCreation.listing.amenities[i]
+                              .description || ''
                           "
                           outlined
                           label="description"
@@ -329,9 +301,330 @@
               </v-card-actions>
             </v-card>
           </v-window-item>
-          <v-window-item :value="6"> {{ step }}</v-window-item>
-          <v-window-item :value="7"> {{ step }}</v-window-item>
-          <v-window-item :value="8"> {{ step }}</v-window-item>
+          <v-window-item :value="6">
+            <p class="text-h6 font-weight-light mb-0">
+              What Special Features would you be offering your guests
+            </p>
+
+            <v-card elevation="0">
+              <v-card-text class="pa-0">
+                <v-row>
+                  <v-col
+                    cols="12"
+                    md="3"
+                    sm="4"
+                    class="py-0"
+                    v-for="(feature, i) in booleanFeatures"
+                    :key="i"
+                  >
+                    <v-switch flat inset v-model="feature.value">
+                      <template v-slot:label>
+                        <span
+                          ><v-icon>{{ feature.icon }}</v-icon
+                          >{{ feature.name }} ?
+                          {{ feature.value ? 'Yes' : 'No' }}</span
+                        >
+                      </template>
+                    </v-switch>
+                  </v-col>
+                  <v-col> </v-col>
+                </v-row>
+                <v-container class="d-flex justify-center my-4">
+                  <RequestSpecialFeature />
+                </v-container>
+              </v-card-text>
+            </v-card>
+          </v-window-item>
+          <v-window-item :value="7">
+            <p class="text-h6 font-weight-light mb-0">
+              What Rules would you want your guests to be aware of
+            </p>
+            <v-card elevation="0">
+              <v-card-text class="pa-0">
+                <v-row>
+                  <v-col
+                    cols="12"
+                    md="3"
+                    sm="4"
+                    class="py-0"
+                    v-for="(rule, i) in booleanRules"
+                    :key="i"
+                  >
+                    <v-switch flat inset v-model="rule.value">
+                      <template v-slot:label>
+                        <span
+                          ><v-icon>{{
+                            rule.value ? rule.iconAllowed : rule.iconNotAllowed
+                          }}</v-icon>
+                          {{ rule.rule }} ?
+                          {{ rule.value ? 'Yes' : 'No' }}</span
+                        >
+                      </template>
+                    </v-switch>
+                  </v-col>
+                  <v-col> </v-col>
+                </v-row>
+              </v-card-text>
+            </v-card>
+          </v-window-item>
+          <v-window-item :value="8">
+            <p class="text-h6 font-weight-light mb-0">
+              What Rules would you want your guests to be aware of
+            </p>
+            <p class="">How much notice do you need before a guest arrives ?</p>
+            <v-select
+              outlined
+              :items="[0, 1, 2, 3, 4, 5, 6, 7]"
+              v-model="guestArrivalDaysNotice"
+              label="Days Notice"
+            >
+              <template v-slot:selection="{ item }">
+                <span
+                  >{{ item }} {{ item == 1 ? 'day' : 'days'
+                  }}{{ item == 0 ? ' (Same day)' : '' }}</span
+                >
+              </template>
+            </v-select>
+            <p>How far in Advance can Guests Book ?</p>
+            <v-select
+              outlined
+              v-model="guestBookingMonthsInAdvance"
+              :items="[1, 2, 3, 4, 5, 6, 12]"
+              label="Months in advance"
+            >
+              <template v-slot:selection="{ item }">
+                <span
+                  >{{ item }} {{ item == 1 ? 'month' : 'months' }} in advance
+                  {{ item == 12 ? '(one year)' : '' }}</span
+                >
+              </template>
+            </v-select>
+            <p>How long can Guests stay?</p>
+            <v-col cols="12" sm="12">
+              <v-slider
+                v-model="bookingStayDaysMin"
+                color="orange"
+                label="Min"
+                ticks="always"
+                step="1"
+                persistent-hint
+                :hint="
+                  `${bookingStayDaysMin} ${
+                    bookingStayDaysMin == 1 ? 'Day' : 'Days'
+                  } Minimum`
+                "
+                min="1"
+                max="7"
+                thumb-label
+              >
+              </v-slider>
+            </v-col>
+            <v-col cols="12" sm="12">
+              <v-slider
+                v-model="bookingStayDaysMax"
+                color="orange"
+                label="Max"
+                ticks="always"
+                step="3"
+                persistent-hint
+                :hint="
+                  `${bookingStayDaysMax} ${
+                    bookingStayDaysMax == 1 ? 'Day' : 'Days'
+                  } ${
+                    bookingStayDaysMax > 7 && bookingStayDaysMax < 30
+                      ? ' (over ' +
+                        Math.floor(bookingStayDaysMax / 7) +
+                        ' week(s)'
+                      : ''
+                  }
+                  ${
+                    bookingStayDaysMax >= 30 && bookingStayDaysMax <= 180
+                      ? ' - over ' +
+                        Math.floor(bookingStayDaysMax / 28) +
+                        ' month(s)'
+                      : ''
+                  } 
+                  Maximum`
+                "
+                min="1"
+                max="180"
+                thumb-label
+              ></v-slider>
+            </v-col>
+          </v-window-item>
+          <v-window-item :value="9">
+            <p class="text-h6 font-weight-light mb-0">
+              Set your pricing
+            </p>
+
+            <!-- <v-switch
+              label="Offer alternate prices"
+              v-model="hasAlternativePricing"
+            ></v-switch> -->
+
+            <v-row class="d-flex flex-wrap align-center">
+              <v-col
+                class="py-0 d-flex"
+                :class="
+                  $vuetify.breakpoint.smAndDown
+                    ? 'justify-start mb-0'
+                    : 'justify-end mb-3'
+                "
+                cols="12"
+                sm="6"
+                md="3"
+              >
+                <p
+                  class="headline"
+                  :class="$vuetify.breakpoint.smAndDown ? 'mb-3' : 'mb-6'"
+                >
+                  Set Basic Price
+                </p>
+              </v-col>
+              <v-col
+                class="py-0 d-flex"
+                :class="
+                  $vuetify.breakpoint.smAndDown
+                    ? 'justify-start mb-0'
+                    : 'justify-end mb-3'
+                "
+                cols="12"
+                sm="6"
+                md="3"
+              >
+                <v-text-field
+                  outlined
+                  v-model="basicPrice"
+                  label="Price per day (24Hrs)"
+                >
+                  <template slot="prepend" class="mt-3 mx-auto">
+                    <span class="headline pb-6">&#8358;</span>
+                  </template>
+                </v-text-field>
+              </v-col>
+              <v-col
+                class="py-0 d-flex"
+                cols="12"
+                sm="6"
+                md="3"
+                :class="
+                  $vuetify.breakpoint.smAndDown
+                    ? 'justify-start mb-0'
+                    : 'justify-end mb-3'
+                "
+              >
+                <v-checkbox
+                  class="mt-0"
+                  v-model="hasPricePerWeekend"
+                  label="Set Weekend Price"
+                ></v-checkbox>
+              </v-col>
+              <v-expand-transition>
+                <v-col
+                  class="py-0"
+                  v-show="hasPricePerWeekend"
+                  cols="12"
+                  sm="6"
+                  md="3"
+                >
+                  <v-text-field
+                    outlined
+                    label="Weekend Price"
+                    v-model="pricePerWeekend"
+                  >
+                    <template slot="prepend" class="mt-3 mx-auto">
+                      <span class="headline pb-6">&#8358;</span>
+                    </template>
+                  </v-text-field>
+                </v-col>
+              </v-expand-transition>
+              <v-col
+                :class="
+                  $vuetify.breakpoint.smAndDown
+                    ? 'justify-start mb-0'
+                    : 'justify-end mb-3'
+                "
+                class="py-0 d-flex"
+                cols="12"
+                sm="6"
+                md="3"
+              >
+                <v-checkbox
+                  class="mt-0"
+                  v-model="hasPricePerWeek"
+                  label="Set Weekly Price"
+                ></v-checkbox>
+              </v-col>
+
+              <v-expand-transition>
+                <v-col
+                  class="py-0"
+                  v-show="hasPricePerWeek"
+                  cols="12"
+                  sm="6"
+                  md="3"
+                >
+                  <v-text-field
+                    outlined
+                    label="Weekly Price"
+                    type="number"
+                    v-model="pricePerWeek"
+                  >
+                    <template slot="prepend" class="mt-3 mx-auto">
+                      <span class="headline pb-6">&#8358;</span>
+                    </template>
+                  </v-text-field>
+                </v-col>
+              </v-expand-transition>
+              <v-col
+                :class="
+                  $vuetify.breakpoint.smAndDown
+                    ? 'justify-start mb-0'
+                    : 'justify-end mb-3'
+                "
+                class="py-0 d-flex"
+                cols="12"
+                sm="6"
+                md="3"
+              >
+                <v-checkbox
+                  class="mt-0"
+                  v-model="hasPricePerMonth"
+                  label="Set Monthly Price"
+                ></v-checkbox>
+              </v-col>
+              <v-expand-transition>
+                <v-col
+                  class="py-0"
+                  v-show="hasPricePerMonth"
+                  cols="12"
+                  sm="6"
+                  md="3"
+                >
+                  <v-text-field
+                    outlined
+                    label="Monthly Price"
+                    type="number"
+                    v-model="pricePerMonth"
+                  >
+                    <template slot="prepend" class="mt-3 mx-auto">
+                      <span class="headline pb-6">&#8358;</span>
+                    </template>
+                  </v-text-field>
+                </v-col>
+              </v-expand-transition>
+            </v-row>
+          </v-window-item>
+          <v-window-item :value="10">
+            <p class="text-h6 font-weight-light mb-0">
+              What Rules would you want your guests to be aware of
+            </p>
+          </v-window-item>
+          <v-window-item :value="10">
+            <p class="text-h6 font-weight-light mb-0">
+              What Rules would you want your guests to be aware of
+            </p>
+          </v-window-item>
         </v-window>
       </v-card-text>
       <v-card-actions class="pt-0">
@@ -381,17 +674,173 @@ import EditListingImage from '../blocks/EditListingImage';
 import AddListingImage from '../blocks/AddListingImage';
 import { mapActions, mapGetters } from 'vuex';
 import { allRegexes } from '../helpers/config';
+import RequestSpecialFeature from '../modals/RequestFeatureModal';
 // import 'vue-croppa/dist/vue-croppa.css'
 export default {
   components: {
     Alert,
     EditListingImage,
     AddListingImage,
+    RequestSpecialFeature,
   },
   props: ['listingData'],
   data() {
     return {
-      amenityDescriptions: [],
+      basicPrice: 0,
+      hasPricePerWeekend: false,
+      hasPricePerWeek: false,
+      hasPricePerMonth: false,
+      pricePerWeekend: null,
+      pricePerWeek: null,
+      pricePerMonth: null,
+      guestArrivalDaysNotice: 0,
+      guestBookingMonthsInAdvance: 0,
+      bookingStayDaysMin: 0,
+      bookingStayDaysMax: 1,
+      placeDescriptions: [
+        {
+          name: '',
+        },
+      ],
+      periods: '',
+      mySwitch: false,
+
+      booleanRules: [
+        {
+          rule: 'Children/Babies Allowed',
+          iconAllowed: 'mdi-baby',
+          iconNotAllowed: 'mdi-cancel',
+          value: false,
+        },
+        {
+          rule: 'Smoking Allowed',
+          iconAllowed: 'mdi-smoking',
+          iconNotAllowed: 'mdi-smoking-off',
+          value: false,
+        },
+        {
+          rule: 'Friends/Visitors Allowed',
+          iconAllowed: 'mdi-account',
+          iconNotAllowed: 'mdi-account-off',
+          value: false,
+        },
+        {
+          rule: 'Spouse/Lovers Allowed',
+          iconAllowed: 'mdi-heart',
+          iconNotAllowed: 'mdi-heart-off',
+          value: false,
+        },
+        {
+          rule: 'Pet(s) Allowed',
+          iconAllowed: 'mdi-paw',
+          iconNotAllowed: 'mdi-paw-off',
+          value: false,
+        },
+        {
+          rule: 'Parties/Events allowed',
+          iconAllowed: 'mdi-food',
+          iconNotAllowed: 'mdi-food-off',
+          value: false,
+        },
+        {
+          rule: 'Alcohol Allowed',
+          iconAllowed: 'mdi-cup',
+          iconNotAllowed: 'mdi-cup-off',
+          value: false,
+        },
+      ],
+      booleanFeatures: [
+        {
+          name: '24hr Power Supply',
+          icon: 'mdi-lightbulb-on',
+          value: false,
+        },
+        {
+          name: 'Swimming Pool',
+          icon: 'mdi-pool',
+          value: false,
+        },
+        {
+          name: 'Power Generator',
+          icon: 'mdi-power',
+          value: false,
+        },
+        {
+          name: 'Private kitchen',
+          icon: 'mdi-chef-hat',
+          value: false,
+        },
+        {
+          name: 'Home Gym',
+          icon: 'mdi-dumbbell',
+          value: false,
+        },
+        {
+          name: 'Free Wifi',
+          icon: 'mdi-wifi',
+          value: false,
+        },
+        {
+          name: 'Private Garage',
+          icon: 'mdi-garage',
+          value: false,
+        },
+        {
+          name: 'Playground',
+          icon: 'mdi-beach',
+          value: false,
+        },
+        {
+          name: 'Close to City Center',
+          icon: 'mdi-city',
+          value: false,
+        },
+        {
+          name: 'Easy Commute',
+          icon: 'mdi-train-car',
+          value: false,
+        },
+        {
+          name: 'Hot Water',
+          icon: 'mdi-kettle-steam',
+          value: false,
+        },
+        {
+          name: 'Dedicated WorkSpace',
+          icon: 'mdi-table-chair',
+          value: false,
+        },
+        {
+          name: 'Washing Machine',
+          icon: 'mdi-washing-machine',
+          value: false,
+        },
+        {
+          name: 'Clothes Cabinet',
+          icon: 'mdi-hanger',
+          value: false,
+        },
+        {
+          name: 'Pressing Iron',
+          icon: 'mdi-tshirt-v',
+          value: false,
+        },
+        {
+          name: 'Free Parking Space',
+          icon: 'mdi-car-hatchback',
+          value: false,
+        },
+      ],
+      // booleanFeatures: [
+      //   'Swimming Pool',
+      //   'Free Wifi',
+      //   'Garage',
+      //   'Playground',
+      //   'City Center',
+      //   '24Hr Power supply',
+      //   '',
+      // ],
+
       amenitiesData: [],
       amenities: [
         'TV',
@@ -400,9 +849,9 @@ export default {
         'Water Supply',
         'Power Supply',
         'Laundry',
+        'Bathroom',
         'Toiletries',
       ],
-      selectedAmenities: [],
       mainImageUploaded: this.listingData.listingImages.some(
         (image) => image.listingOrder == 1
       ),
@@ -444,7 +893,7 @@ export default {
       state: null,
       noChecks: false,
       step: 1,
-      totalNoOfSteps: 7,
+      totalNoOfSteps: 11,
       moving: false,
       information: [
         {
@@ -478,6 +927,7 @@ export default {
       'updateListingInCreation',
       'showToast',
     ]),
+    addSpecialFeature() {},
     removeAmenity(i) {
       this.amenitiesData.splice(i, 1);
     },
@@ -486,32 +936,6 @@ export default {
         amenity: '',
         description: '',
       });
-    },
-    selectAmenity(e, i) {
-      let selectedAmenities = this.amenitiesData.map(
-        (amenity) => amenity.amenity
-      );
-      console.log(e, selectedAmenities);
-      if (selectedAmenities.includes(e)) {
-        this.showToast({
-          sclass: 'error',
-          message: 'Already selected',
-          timeout: 2000,
-        });
-        this.amenitiesData[i].amenity = '';
-      }
-      // this.amenities.splice(this.amenities.indexOf(e), 1);
-      // setTimeout(() => {
-      //   this.$refs.amenitySelect.menuIsActive = false;
-      // }, 50);
-      // if (e.length > 0) {
-      //   e.forEach((amenity, index) => {
-      //     this.amenitiesData.push({
-      //       amenity,
-      //       description: this.amenityDescriptions[index],
-      //     });
-      //   });
-      // }
     },
     uploadImage() {
       this.imageCropModal = true;
@@ -770,16 +1194,53 @@ export default {
         }
       }
       if (step == 6) {
-        this.step++;
-        this.moving = false;
+        this.updateListingInCreation({
+          id: this.listingInCreation.listing.id,
+          specialFeatures: this.booleanFeatures,
+          percentComplete: this.percentComplete,
+        }).then(() => {
+          this.step++;
+          this.moving = false;
+        });
+        console.log(this.booleanFeatures);
       }
       if (step == 7) {
-        this.step++;
-        this.moving = false;
+        this.updateListingInCreation({
+          id: this.listingInCreation.listing.id,
+          rules: this.booleanRules,
+          percentComplete: this.percentComplete,
+        }).then(() => {
+          this.step++;
+          this.moving = false;
+        });
       }
       if (step == 8) {
-        this.step++;
-        this.moving = false;
+        this.updateListingInCreation({
+          id: this.listingInCreation.listing.id,
+          guestArrivalDaysNotice: this.guestArrivalDaysNotice,
+          guestBookingMonthsInAdvance: this.guestBookingMonthsInAdvance,
+          bookingStayDaysMin: this.bookingStayDaysMin,
+          bookingStayDaysMax: this.bookingStayDaysMax,
+          percentComplete: this.percentComplete,
+        }).then(() => {
+          this.step++;
+          this.moving = false;
+        });
+      }
+      if (step == 9) {
+        this.updateListingInCreation({
+          id: this.listingInCreation.listing.id,
+          basicPrice: this.basicPrice,
+          pricePerWeekend: this.hasPricePerWeekend
+            ? this.pricePerWeekend
+            : null,
+          pricePerWeek: this.hasPricePerWeek ? this.pricePerWeek : null,
+          pricePerMonth: this.hasPricePerMonth ? this.pricePerMonth : null,
+          percentComplete: this.percentComplete,
+        }).then(() => {
+          this.step++;
+          this.moving = false;
+        });
       }
     },
   },
@@ -853,16 +1314,14 @@ export default {
         : 'Select type of place from a list';
     },
   },
-  watch: {
-    selectedAmenities(val) {
-      console.log(val);
-      setTimeout(() => {
-        this.$refs.amenitySelect.menuIsActive = false;
-      }, 50);
-    },
-  },
+
   beforeMount() {
-    this.amenitiesData = JSON.parse(this.listingInCreation.listing.amenities);
+    this.amenitiesData = this.listingInCreation.listing.amenities;
+    this.booleanFeatures = this.listingInCreation.listing.specialFeatures;
+    this.booleanRules = this.listingInCreation.listing.rules;
+    // this.booleanFeatures.forEach((feature) => {
+    //   this.booleanFeaturesData.push({ name: feature, value: false });
+    // });
   },
   mounted() {
     // console.log(this.$vuetify.breakpoint);
