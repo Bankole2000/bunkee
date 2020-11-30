@@ -37,10 +37,11 @@
       >
 
       <v-spacer v-if="$vuetify.breakpoint.mdAndUp"></v-spacer>
+      <OldChatModal />
       <v-btn text class="text-capitalize" v-if="$vuetify.breakpoint.mdAndUp"
         >Become A Host</v-btn
       >
-      <ChatModal />
+      <ContactModal />
       <v-btn
         v-if="$route.path != '/login' && $route.path != '/signup'"
         icon
@@ -206,12 +207,14 @@ import { mapGetters, mapActions } from 'vuex';
 import { config } from '../helpers/config';
 import LoginModal from '../modals/LoginModal';
 import SignupModal from '../modals/SignupModal';
-import ChatModal from '../modals/MobileChatModal';
+import OldChatModal from '../modals/MobileChatModal';
+import ContactModal from '../modals/ContactsModal';
 export default {
   components: {
     LoginModal,
     SignupModal,
-    ChatModal,
+    OldChatModal,
+    ContactModal,
   },
   data() {
     return {

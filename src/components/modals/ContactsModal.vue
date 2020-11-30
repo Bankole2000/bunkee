@@ -70,8 +70,29 @@
                   >Invites</v-subheader
                 >
               </v-list>
-
               <v-list
+                subheader
+                class="py-0"
+                v-for="contact in invites"
+                :key="contact.id"
+              >
+                <ChatModal :contact="contact" :key="contactModalKey" />
+              </v-list>
+
+              <v-list subheader>
+                <v-divider></v-divider>
+                <v-subheader class="headline font-weight-light pl-0 ml-8" inset
+                  >Contacts</v-subheader
+                >
+              </v-list>
+              <v-list class="py-0" subheader>
+                <v-divider></v-divider>
+
+                <v-subheader class="headline font-weight-light pl-0 ml-8" inset
+                  >Blocked</v-subheader
+                >
+              </v-list>
+              <!-- <v-list
                 subheader
                 class="py-0"
                 v-for="(item, i) in items"
@@ -92,7 +113,7 @@
                   inset
                   >Blocked</v-subheader
                 >
-              </v-list>
+              </v-list> -->
 
               <!-- <v-list two-line>
             <template v-for="(item, index) in items">
@@ -203,16 +224,18 @@
 </template>
 
 <script>
-import MobileSingleChatModal from '../modals/MobileSingleChatModal';
-import { mapGetters } from 'vuex';
+import ChatModal from '../modals/ChatModal';
+import { mapGetters, mapActions } from 'vuex';
 export default {
   components: {
-    MobileSingleChatModal,
+    ChatModal,
   },
+
   data() {
     return {
       selected: [2],
       step: 0,
+      contactModalKey: 0,
       dialog: false,
       notifications: false,
       sound: true,
@@ -335,8 +358,64 @@ export default {
       ],
     };
   },
+  methods: {
+    ...mapActions(['updateUserContacts']),
+    forceRerender() {
+      this.contactModalKey += 1;
+    },
+  },
+  sockets: {
+    // newLogin: function(data) {
+    //   if (this.currentUserContacts) {
+    //     this.currentUserContacts.forEach((contact) => {
+    //       if (data.uuid == contact.inviter.uuid) {
+    //         this.updateUserContacts({
+    //           uuid: data.uuid,
+    //           status: data.isOnline,
+    //           lastSeen: data.lastSeen,
+    //           contactId: contact.id,
+    //         });
+    //       }
+    //     });
+    //   }
+    //   console.log(data);
+    //   this.forceRerender();
+    // },
+    // userLogout: function(data) {
+    //   console.log(this.currentUserContacts);
+    //   this.currentUserContacts
+    //     .forEach((contact) => {
+    //       if (data.uuid == contact.inviter.uuid) {
+    //         this.updateUserContacts({
+    //           uuid: data.uuid,
+    //           status: data.isOnline,
+    //           lastSeen: data.lastSeen,
+    //           contactId: contact.id,
+    //         });
+    //       }
+    //     })
+    //     .then(() => {
+    //       this.forceRerender();
+    //     });
+    //   console.log(data);
+    // },
+  },
   computed: {
     ...mapGetters(['loggedInUser', 'currentUserContacts']),
+    invites() {
+      return this.currentUserContacts.filter(
+        (contact) =>
+          !contact.hasBeenAccepted &&
+          !contact.hasBeenDeclined &&
+          !contact.isBlocked
+      );
+    },
+  },
+  beforeMount() {
+    this.forceRerender();
+  },
+  mounted() {
+    console.log(this.invites);
   },
 };
 </script>

@@ -1,5 +1,12 @@
 <template>
   <div class="create-listing-modal">
+    <v-card class="transparent text-center" elevation="0" @click="showModal">
+      <v-card-text style="border: 5px dashed grey;">
+        <v-icon size="120">mdi-plus</v-icon>
+        <p class="display-1">Add a listing</p>
+      </v-card-text>
+    </v-card>
+
     <v-dialog
       v-model="dialog"
       fullscreen
@@ -7,19 +14,6 @@
       hide-overlay
       transition="dialog-bottom-transition"
     >
-      <template v-slot:activator="{ on, attrs }">
-        <v-card
-          class="transparent text-center"
-          elevation="0"
-          v-bind="attrs"
-          v-on="on"
-        >
-          <v-card-text style="border: 5px dashed grey;">
-            <v-icon size="120">mdi-plus</v-icon>
-            <p class="display-1">Add a listing</p>
-          </v-card-text>
-        </v-card>
-      </template>
       <v-card>
         <v-card-title class="pt-3">
           <v-btn icon @click="dialog = false" class="mr-2">
@@ -70,6 +64,12 @@ export default {
   computed: {
     canSave() {
       return true;
+    },
+  },
+  methods: {
+    showModal() {
+      this.$store.commit('removeListingInCreation');
+      this.dialog = true;
     },
   },
   beforeUpdate() {

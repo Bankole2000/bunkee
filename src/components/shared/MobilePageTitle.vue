@@ -58,7 +58,7 @@
 
 <script>
 import MenuModal from '../modals/MenuModal';
-import ChatModal from '../modals/MobileChatModal';
+import ChatModal from '../modals/ContactsModal';
 import Notifications from '../modals/Notifications';
 // import { mapActions, mapGetters } from 'vuex';
 export default {

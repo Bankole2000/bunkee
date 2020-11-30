@@ -9,6 +9,7 @@ export default new Vuex.Store({
     connected: null,
     loading: false,
     currentUser: null,
+    currentUserContacts: null,
     currentUserListings: null,
     listingInCreation: null,
     toast: {
@@ -60,6 +61,40 @@ export default new Vuex.Store({
     SOCKET_ERROR(state, message) {
       state.error = message.error;
     },
+    SOCKET_newLogin(state, message) {
+      console.log(state.currentUserContacts, message);
+      if (state.currentUserContacts) {
+        state.currentUserContacts.forEach((contact) => {
+          if (contact.inviter.uuid == message.uuid) {
+            console.log('Is Inviter', contact.inviter);
+            contact.inviter.isOnline = true;
+            contact.inviter.lastSeen = message.lastSeen;
+          }
+          if (contact.invitee.uuid == message.uuid) {
+            console.log('Is Invitee', contact.invitee);
+            contact.invitee.isOnline = true;
+            contact.invitee.lastSeen = message.lastSeen;
+          }
+        });
+      }
+    },
+    SOCKET_userLogout(state, message) {
+      console.log(state.currentUserContacts, message);
+      if (state.currentUserContacts) {
+        state.currentUserContacts.forEach((contact) => {
+          if (contact.inviter.uuid == message.uuid) {
+            console.log('Is Inviter', contact.inviter);
+            contact.inviter.isOnline = false;
+            contact.inviter.lastSeen = message.lastSeen;
+          }
+          if (contact.invitee.uuid == message.uuid) {
+            console.log('Is Invitee', contact.invitee);
+            contact.invitee.isOnline = false;
+            contact.invitee.lastSeen = message.lastSeen;
+          }
+        });
+      }
+    },
     setLoading(state, payload) {
       state.loading = payload.loading;
     },
@@ -73,6 +108,23 @@ export default new Vuex.Store({
     },
     setCurrentUserListings(state, payload) {
       state.currentUserListings = payload;
+    },
+    setCurrentUserContacts(state, payload) {
+      state.currentUserContacts = payload;
+    },
+    updateCurrentUserContacts(state, payload) {
+      state.currentUserContacts.forEach((contact) => {
+        if (contact.id == payload.contactId) {
+          if (contact.inviter.uuid == payload.uuid) {
+            contact.inviter.isOnline = payload.status;
+            contact.inviter.lastSeen = payload.lastSeen;
+          }
+          if (contact.invitee.uuid == payload.uuid) {
+            contact.invitee.isOnline = payload.status;
+            contact.invitee.lastSeen = payload.lastSeen;
+          }
+        }
+      });
     },
     setListingInCreation(state, payload) {
       state.listingInCreation = {};
@@ -129,6 +181,9 @@ export default new Vuex.Store({
     SOCKET_NEWLOGIN({ commit }, payload) {
       console.log(payload, { commit });
     },
+    updateUserContacts({ commit }, payload) {
+      commit('updateCurrentUserContacts', payload);
+    },
     async setLoading({ commit }, payload) {
       const { loading } = payload;
       commit('setLoading', { loading });
@@ -181,6 +236,16 @@ export default new Vuex.Store({
       const data = await res.json();
       console.log(data, res);
       commit('setCurrentUserListings', data.listings);
+    },
+    async getCurrentUserContacts({ commit, state }) {
+      const res = await fetch(`${config.serverURL}/chat/contacts`, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${state.currentUser.token}`,
+        },
+      });
+      const data = await res.json();
+      commit('setCurrentUserContacts', data.contacts.rows);
     },
     async deleteListingImage({ commit, state }, payload) {
       const res = await fetch(
@@ -350,6 +415,9 @@ export default new Vuex.Store({
   getters: {
     currentUserListings(state) {
       return state.currentUserListings;
+    },
+    currentUserContacts(state) {
+      return state.currentUserContacts;
     },
     toast(state) {
       return state.toast;

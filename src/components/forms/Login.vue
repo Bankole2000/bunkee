@@ -54,7 +54,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(['showToast', 'setUser']),
+    ...mapActions(['showToast', 'setUser', 'getCurrentUserContacts']),
     async checkEmailOrUsername() {
       if (
         !validators.isEmail(this.emailOrUsername) &&
@@ -141,6 +141,7 @@ export default {
           message: data.message,
         }).then(async () => {
           this.setUser({ ...data.user, token: data.token });
+          this.getCurrentUserContacts();
           this.resetForm();
           // TODO: redirect, store token in Local storage ?
           // get IP address, search for listings based on current user location;

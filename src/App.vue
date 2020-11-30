@@ -31,16 +31,16 @@ export default {
     BottomNav,
   },
   sockets: {
-    newLogin: function(data) {
-      console.log(data);
-      console.log(data.user);
-      console.log(data.user.username);
-      this.showToast({
-        sclass: 'info',
-        message: `<span class="font-weight-black amber--text">@${data.user.username}</span> just logged in`,
-        timeout: 2000,
-      });
-    },
+    // newLogin: function(data) {
+    //   console.log(data);
+    //   console.log(data.user);
+    //   console.log(data.user.username);
+    //   this.showToast({
+    //     sclass: 'info',
+    //     message: `<span class="font-weight-black amber--text">@${data.user.username}</span> just logged in`,
+    //     timeout: 2000,
+    //   });
+    // },
   },
 
   data: () => ({

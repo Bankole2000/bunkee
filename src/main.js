@@ -6,6 +6,7 @@ import App from './App.vue';
 import router from './router';
 import store from './store';
 import vuetify from './plugins/vuetify';
+import PriceFilter from './filters/priceFilter';
 import 'roboto-fontface/css/roboto/roboto-fontface.css';
 import '@mdi/font/css/materialdesignicons.css';
 import Croppa from 'vue-croppa';
@@ -28,6 +29,7 @@ Vue.use(
 Vue.use(VueMeta);
 Vue.use(Croppa);
 
+Vue.filter('priceFilter', PriceFilter);
 new Vue({
   router,
   store,

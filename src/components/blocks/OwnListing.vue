@@ -22,7 +22,16 @@
             ><v-icon left>mdi-eye-plus</v-icon> Promote</v-btn
           >
           <v-spacer></v-spacer>
-          <v-btn v-if="listing.isPublished" fab>
+          <v-btn
+            v-if="listing.isPublished"
+            small
+            depressed
+            dark
+            color="green darken-2"
+            :disabled="loading || listing.percentComplete < 100"
+            class="mt-4 mr-3"
+            fab
+          >
             <v-icon>mdi-eye</v-icon>
           </v-btn>
           <v-btn
@@ -118,9 +127,16 @@
       <v-card-text class="py-0 pl-0">
         <div class="d-flex align-center pl-2 pt-2">
           <div class="text-center">
-            <v-rating dense :value="1" readonly></v-rating>
+            <v-rating
+              background-color="grey lighten-3"
+              dense
+              :value="0"
+              readonly
+            ></v-rating>
           </div>
-          <p class="text-subtitle-1 mb-0 ml-2 font-weight-light">
+          <p
+            class="text-subtitle-1 mb-0 ml-2 font-weight-light grey--text text--lighten-2"
+          >
             No Reviews Yet
           </p>
         </div>
@@ -139,9 +155,12 @@
           </div>
 
           <div>
-            <p class="mb-0">
+            <v-card-subtitle class="py-0 px-0 black--text">
               {{ listing.description }}
-            </p>
+            </v-card-subtitle>
+            <!-- <p class="mb-0">
+              {{ listing.description }}
+            </p> -->
           </div>
         </v-card-text>
       </v-card-text>
@@ -249,7 +268,10 @@
 
           <v-list-item-action class="ma-0">
             <p class="text-h5 mb-0 mr-2">
-              <span class="font-weight-black ">&#8358;5k</span> / Night
+              <span class="font-weight-black "
+                >&#8358;{{ listing.basicPrice | priceFilter }}</span
+              >
+              / Night
             </p>
           </v-list-item-action>
         </v-list-item>

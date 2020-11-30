@@ -270,7 +270,10 @@
                       <v-select
                         :items="amenities"
                         :value="
-                          listingInCreation.listing.amenities[i].amenity || ''
+                          listingInCreation.listing.amenities &&
+                          listingInCreation.listing.amenities[i]
+                            ? listingInCreation.listing.amenities[i].amenity
+                            : ''
                         "
                         label="Amenity"
                         outlined
@@ -282,8 +285,11 @@
                           v-show="amenitiesData[i].amenity != ''"
                           v-model="amenitiesData[i].description"
                           :value="
+                            listingInCreation.listing.amenities &&
                             listingInCreation.listing.amenities[i]
-                              .description || ''
+                              ? listingInCreation.listing.amenities[i]
+                                  .description
+                              : ''
                           "
                           outlined
                           label="description"
@@ -617,13 +623,291 @@
           </v-window-item>
           <v-window-item :value="10">
             <p class="text-h6 font-weight-light mb-0">
-              What Rules would you want your guests to be aware of
+              Final Descriptions
             </p>
+            <v-card elevation="0">
+              <v-card-text class="pa-0">
+                <v-slide-y-transition group>
+                  <v-card
+                    v-for="(description, i) in finalDescriptions"
+                    :key="i"
+                    class="rounded-xl my-2"
+                  >
+                    <v-card-title class="primary py-2"
+                      ><p class="mb-0 text-h5 font-weight-light">
+                        Description No {{ i + 1 }}
+                      </p>
+                      <v-spacer></v-spacer
+                      ><v-btn
+                        @click="removeDescription(i)"
+                        small
+                        color="error"
+                        fab
+                      >
+                        <v-icon>mdi-close</v-icon>
+                      </v-btn></v-card-title
+                    >
+                    <v-card-text class="py-4 pb-0">
+                      <v-text-field
+                        v-model="finalDescriptions[i].title"
+                        :value="
+                          listingInCreation.listing.finalDescriptions &&
+                          listingInCreation.listing.finalDescriptions[i]
+                            ? listingInCreation.listing.finalDescriptions[i]
+                                .title
+                            : ''
+                        "
+                        label="Subject"
+                        outlined
+                      >
+                      </v-text-field>
+                      <v-expand-transition>
+                        <v-text-field
+                          v-show="finalDescriptions[i].title != ''"
+                          v-model="finalDescriptions[i].text"
+                          :value="
+                            listingInCreation.listing.finalDescriptions &&
+                            listingInCreation.listing.finalDescriptions[i]
+                              ? listingInCreation.listing.finalDescriptions[i]
+                                  .text
+                              : ''
+                          "
+                          outlined
+                          label="description"
+                        ></v-text-field>
+                      </v-expand-transition>
+                    </v-card-text>
+                  </v-card>
+                </v-slide-y-transition>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn @click="addDescription" class="px-4 my-4"
+                  ><v-icon>mdi-plus</v-icon> Add a description</v-btn
+                >
+              </v-card-actions>
+            </v-card>
           </v-window-item>
-          <v-window-item :value="10">
+          <v-window-item :value="11">
             <p class="text-h6 font-weight-light mb-0">
-              What Rules would you want your guests to be aware of
+              What Utilities (and how many of them) are available to your
+              guests?
             </p>
+            <v-card elevation="0">
+              <v-card-text class="pa-0">
+                <v-slide-y-transition group>
+                  <v-card
+                    v-for="(utility, i) in utilities"
+                    :key="i"
+                    class="rounded-xl my-2"
+                  >
+                    <v-card-title class="primary py-2"
+                      ><p class="mb-0 text-h5 font-weight-light">
+                        Utility No {{ i + 1 }} -
+                        <span class="font-weight-bold">{{
+                          utilities[i].name
+                        }}</span>
+                      </p>
+                      <v-spacer></v-spacer
+                      ><v-btn @click="removeUtility(i)" small color="error" fab>
+                        <v-icon>mdi-close</v-icon>
+                      </v-btn></v-card-title
+                    >
+                    <v-card-text class="py-4 pb-0">
+                      <v-text-field
+                        v-model="utilities[i].name"
+                        :value="
+                          listingInCreation.listing.utilities &&
+                          listingInCreation.listing.utilities[i]
+                            ? listingInCreation.listing.utilities[i].name
+                            : ''
+                        "
+                        label="Name"
+                        outlined
+                      >
+                      </v-text-field>
+                      <v-expand-transition>
+                        <v-text-field
+                          v-show="utilities[i].name != ''"
+                          v-model="utilities[i].number"
+                          :value="
+                            listingInCreation.listing.utilities &&
+                            listingInCreation.listing.utilities[i]
+                              ? listingInCreation.listing.utilities[i].number
+                              : ''
+                          "
+                          outlined
+                          :label="`Number of ${utilities[i].name}`"
+                        >
+                          <template v-slot:prepend>
+                            <v-tooltip bottom>
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-btn
+                                  color="primary"
+                                  dark
+                                  @click="
+                                    utilities[i].number > 0
+                                      ? utilities[i].number--
+                                      : {}
+                                  "
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  ><v-icon>mdi-minus</v-icon></v-btn
+                                >
+                              </template>
+                              <span>Remove {{ utilities[i].name }}</span>
+                            </v-tooltip>
+                          </template>
+                          <template v-slot:append-outer>
+                            <v-tooltip bottom>
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-btn
+                                  color="primary"
+                                  dark
+                                  @click="utilities[i].number++"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  ><v-icon>mdi-plus</v-icon></v-btn
+                                >
+                              </template>
+                              <span>Add {{ utilities[i].name }}</span>
+                            </v-tooltip>
+                          </template>
+                        </v-text-field>
+                      </v-expand-transition>
+
+                      <v-expand-transition>
+                        <v-text-field
+                          v-show="utilities[i].number > 0"
+                          v-model="utilities[i].description"
+                          hide-details
+                          :value="
+                            listingInCreation.listing.utilities &&
+                            listingInCreation.listing.utilities[i]
+                              ? listingInCreation.listing.utilities[i]
+                                  .description
+                              : ''
+                          "
+                          outlined
+                          :label="`Description of ${utilities[i].name}`"
+                        >
+                        </v-text-field>
+                      </v-expand-transition>
+                      <v-expand-transition>
+                        <v-switch
+                          v-show="utilities[i].number > 0"
+                          v-model="utilities[i].atLeastOneIsPrivate"
+                          class="mt-3"
+                        >
+                          <template v-slot:label>
+                            <span
+                              >At least one is private :
+                              <span class="font-weight-bold">{{
+                                utilities[i].atLeastOneIsPrivate ? 'Yes' : 'No'
+                              }}</span></span
+                            >
+                          </template>
+                        </v-switch>
+                      </v-expand-transition>
+                    </v-card-text>
+                  </v-card>
+                </v-slide-y-transition>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn @click="addUtility" class="px-4 my-4"
+                  ><v-icon>mdi-plus</v-icon> Add a Utility</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </v-window-item>
+          <v-window-item :value="12">
+            <p class="text-h6 font-weight-light mb-0">
+              Final Descriptions
+            </p>
+            <v-card elevation="0">
+              <v-card-text class="pa-0">
+                <v-slide-y-transition group>
+                  <v-card
+                    v-for="(preference, i) in guestPreferences"
+                    :key="i"
+                    class="rounded-xl my-2"
+                  >
+                    <v-card-title class="primary py-2"
+                      ><p class="mb-0 text-h5 font-weight-light">
+                        Preference No {{ i + 1 }}
+                      </p>
+                      <v-spacer></v-spacer
+                      ><v-btn
+                        @click="removeGuestPreference(i)"
+                        small
+                        color="error"
+                        fab
+                      >
+                        <v-icon>mdi-close</v-icon>
+                      </v-btn></v-card-title
+                    >
+                    <v-card-text class="py-4 pb-0">
+                      <v-text-field
+                        v-model="guestPreferences[i].topic"
+                        :value="
+                          listingInCreation.listing.guestPreferences &&
+                          listingInCreation.listing.guestPreferences[i]
+                            ? listingInCreation.listing.guestPreferences[i]
+                                .title
+                            : ''
+                        "
+                        label="Topic"
+                        outlined
+                      >
+                      </v-text-field>
+                      <v-expand-transition>
+                        <v-text-field
+                          v-show="guestPreferences[i].topic != ''"
+                          v-model="guestPreferences[i].preference"
+                          :value="
+                            listingInCreation.listing.guestPreferences &&
+                            listingInCreation.listing.guestPreferences[i]
+                              ? listingInCreation.listing.guestPreferences[i]
+                                  .preference
+                              : ''
+                          "
+                          outlined
+                          label="Preference"
+                        ></v-text-field>
+                      </v-expand-transition>
+                    </v-card-text>
+                  </v-card>
+                </v-slide-y-transition>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn @click="addGuestPreference" class="px-4 my-4"
+                  ><v-icon>mdi-plus</v-icon> Add a preference</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </v-window-item>
+          <v-window-item :value="13">
+            <p class="text-h6 font-weight-light mb-0">
+              Publish and Promote
+            </p>
+            <v-card elevation="0">
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn @click="promoteListing"
+                  ><v-icon>mdi-bullhorn</v-icon>Promote / Sponsor this
+                  listing</v-btn
+                >
+                <v-btn @click="publishListing" class="px-4 my-4"
+                  ><v-icon>mdi-plus</v-icon> Publish this Listing</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </v-window-item>
+          <v-window-item :value="14">
+            <p>All Done!!!</p>
+            <v-btn>View Listing</v-btn>
           </v-window-item>
         </v-window>
       </v-card-text>
@@ -686,6 +970,7 @@ export default {
   props: ['listingData'],
   data() {
     return {
+      isPublished: false,
       basicPrice: 0,
       hasPricePerWeekend: false,
       hasPricePerWeek: false,
@@ -697,9 +982,36 @@ export default {
       guestBookingMonthsInAdvance: 0,
       bookingStayDaysMin: 0,
       bookingStayDaysMax: 1,
-      placeDescriptions: [
+      guestPreferences: [
         {
-          name: '',
+          topic: '',
+          preference: '',
+        },
+      ],
+      utilities: [
+        {
+          name: 'Beds',
+          number: 1,
+          description: '',
+          atLeastOneIsPrivate: false,
+        },
+        {
+          name: 'Bathrooms',
+          number: 1,
+          description: '',
+          atLeastOneIsPrivate: false,
+        },
+        {
+          name: 'Toilets',
+          number: 1,
+          description: '',
+          atLeastOneIsPrivate: false,
+        },
+      ],
+      finalDescriptions: [
+        {
+          title: '',
+          text: '',
         },
       ],
       periods: '',
@@ -869,6 +1181,8 @@ export default {
         'Boys Quarters',
         'Face Me I Face You',
         'Boutique Hotel',
+        'Guest House',
+        'Event Center',
       ],
       typeOfListing: this.listingData.typeOfListing,
       typeOfListingOptions: ['Entire Place', 'Private Room', 'Shared Room'],
@@ -893,7 +1207,7 @@ export default {
       state: null,
       noChecks: false,
       step: 1,
-      totalNoOfSteps: 11,
+      totalNoOfSteps: 13,
       moving: false,
       information: [
         {
@@ -927,7 +1241,48 @@ export default {
       'updateListingInCreation',
       'showToast',
     ]),
+    promoteListing() {
+      console.log('Listing Promoted');
+    },
+    publishListing() {
+      this.isPublished = true;
+      // console.log(object);
+      this.updateListingInCreation({
+        id: this.listingInCreation.listing.id,
+        isPublished: this.isPublished,
+        percentComplete: this.percentComplete,
+      });
+    },
     addSpecialFeature() {},
+    removeGuestPreference(i) {
+      this.guestPreferences.splice(i, 1);
+    },
+    addGuestPreference() {
+      this.guestPreferences.push({
+        topic: '',
+        preference: '',
+      });
+    },
+    removeUtility(i) {
+      this.utilities.splice(i, 1);
+    },
+    addUtility() {
+      this.utilities.push({
+        name: '',
+        number: 0,
+        description: '',
+        atLeastOneIsPrivate: false,
+      });
+    },
+    removeDescription(i) {
+      this.finalDescriptions.splice(i, 1);
+    },
+    addDescription() {
+      this.finalDescriptions.push({
+        title: '',
+        text: '',
+      });
+    },
     removeAmenity(i) {
       this.amenitiesData.splice(i, 1);
     },
@@ -1242,6 +1597,45 @@ export default {
           this.moving = false;
         });
       }
+      if (step == 10) {
+        this.updateListingInCreation({
+          id: this.listingInCreation.listing.id,
+          finalDescriptions: this.finalDescriptions,
+          percentComplete: this.percentComplete,
+        }).then(() => {
+          this.step++;
+          this.moving = false;
+        });
+      }
+      if (step == 11) {
+        this.updateListingInCreation({
+          id: this.listingInCreation.listing.id,
+          utilities: this.utilities,
+          percentComplete: this.percentComplete,
+        }).then(() => {
+          this.step++;
+          this.moving = false;
+        });
+      }
+      if (step == 12) {
+        this.updateListingInCreation({
+          id: this.listingInCreation.listing.id,
+          guestPreferences: this.guestPreferences,
+          percentComplete: this.percentComplete,
+        }).then(() => {
+          this.step++;
+          this.moving = false;
+        });
+      }
+      if (step == 13) {
+        this.updateListingInCreation({
+          id: this.listingInCreation.listing.id,
+          percentComplete: 100,
+        }).then(() => {
+          this.step++;
+          this.moving = false;
+        });
+      }
     },
   },
 
@@ -1285,6 +1679,16 @@ export default {
           return '📝 Any Other Details';
         case 8:
           return '🥇All Done';
+        case 9:
+          return '🥇All Done';
+        case 10:
+          return '🥇All Done';
+        case 11:
+          return '🥇All Done';
+        case 12:
+          return '🥇All Done';
+        case 13:
+          return '📢 Publish and/or Promote';
         default:
           return 'Add Listing Details';
       }
@@ -1316,9 +1720,84 @@ export default {
   },
 
   beforeMount() {
-    this.amenitiesData = this.listingInCreation.listing.amenities;
-    this.booleanFeatures = this.listingInCreation.listing.specialFeatures;
-    this.booleanRules = this.listingInCreation.listing.rules;
+    this.amenitiesData = this.listingInCreation.listing.amenities
+      ? this.listingInCreation.listing.amenities
+      : [];
+    this.booleanFeatures = this.listingInCreation.listing.specialFeatures
+      ? this.listingInCreation.listing.specialFeatures
+      : this.booleanFeatures;
+    this.booleanRules = this.listingInCreation.listing.rules
+      ? this.listingInCreation.listing.rules
+      : this.booleanRules;
+    this.basicPrice = this.listingInCreation.listing.basicPrice
+      ? this.listingInCreation.listing.basicPrice
+      : 0;
+    this.pricePerWeekend = this.listingInCreation.listing.pricePerWeekend
+      ? this.listingInCreation.listing.pricePerWeekend
+      : null;
+    this.listingInCreation.listing.pricePerWeekend
+      ? (this.hasPricePerWeekend = true)
+      : (this.hasPricePerWeekend = false);
+    this.pricePerWeek = this.listingInCreation.listing.pricePerWeek
+      ? this.listingInCreation.listing.pricePerWeek
+      : null;
+    this.listingInCreation.listing.pricePerWeek
+      ? (this.hasPricePerWeek = true)
+      : (this.hasPricePerWeek = false);
+    this.pricePerMonth = this.listingInCreation.listing.pricePerMonth
+      ? this.listingInCreation.listing.pricePerMonth
+      : null;
+    this.listingInCreation.listing.pricePerMonth
+      ? (this.hasPricePerMonth = true)
+      : (this.hasPricePerMonth = false);
+
+    this.guestArrivalDaysNotice = this.listingInCreation.listing
+      .guestArrivalDaysNotice
+      ? this.listingInCreation.listing.guestArrivalDaysNotice
+      : 0;
+    this.guestBookingMonthsInAdvance = this.listingInCreation.listing
+      .guestBookingMonthsInAdvance
+      ? this.listingInCreation.listing.guestBookingMonthsInAdvance
+      : 0;
+    this.bookingStayDaysMin = this.listingInCreation.listing.bookingStayDaysMin
+      ? this.listingInCreation.listing.bookingStayDaysMin
+      : 0;
+    this.bookingStayDaysMax = this.listingInCreation.listing.bookingStayDaysMax
+      ? this.listingInCreation.listing.bookingStayDaysMax
+      : 0;
+    this.isPublished = this.listingInCreation.listing.isPublished
+      ? this.listingInCreation.listing.isPublished
+      : false;
+    this.finalDescriptions = this.listingInCreation.listing.finalDescriptions
+      ? this.listingInCreation.listing.finalDescriptions
+      : [{ title: '', text: '' }];
+    this.guestPreferences = this.listingInCreation.listing.guestPreferences
+      ? this.listingInCreation.listing.guestPreferences
+      : [{ topic: '', preference: '' }];
+
+    this.utilities = this.listingInCreation.listing.utilities
+      ? this.listingInCreation.listing.utilities
+      : [
+          {
+            name: 'Beds',
+            number: 1,
+            description: '',
+            atLeastOneIsPrivate: false,
+          },
+          {
+            name: 'Bathrooms',
+            number: 1,
+            description: '',
+            atLeastOneIsPrivate: false,
+          },
+          {
+            name: 'Toilets',
+            number: 1,
+            description: '',
+            atLeastOneIsPrivate: false,
+          },
+        ];
+
     // this.booleanFeatures.forEach((feature) => {
     //   this.booleanFeaturesData.push({ name: feature, value: false });
     // });
