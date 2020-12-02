@@ -61,6 +61,35 @@ export default new Vuex.Store({
     SOCKET_ERROR(state, message) {
       state.error = message.error;
     },
+    // SOCKET_pingMessage(state, data) {
+    //   state.currentUserContacts.forEach((contact) => {
+    //     if (contact.id == data.conversationId) {
+    //       contact.conversation.push(data);
+    //     }
+    //   });
+    // },
+    SOCKET_deleteContact(state, data) {
+      // listing.listingImages.splice(
+      //   listing.listingImages.findIndex((v) => v.listingOrder === index),
+      //   1
+      // );
+      // get index of contact with id in payload
+      state.currentUserContacts.splice(
+        state.currentUserContacts.findIndex(
+          (contact) => contact.id === data.contactId
+        ),
+        1
+      );
+      // const removeIndex = state.currentUserContacts
+      //   .map((contact) => {
+      //     contact.id;
+      //   })
+      //   .indexOf(data.contactId);
+      // // remove contact
+      // state.currentUserContacts.splice(removeIndex, 1);
+      // state.message = data;
+      console.log(data);
+    },
     SOCKET_newLogin(state, message) {
       console.log(state.currentUserContacts, message);
       if (state.currentUserContacts) {
@@ -69,11 +98,13 @@ export default new Vuex.Store({
             console.log('Is Inviter', contact.inviter);
             contact.inviter.isOnline = true;
             contact.inviter.lastSeen = message.lastSeen;
+            contact.inviter.currentSocketId = message.currentSocketId;
           }
           if (contact.invitee.uuid == message.uuid) {
             console.log('Is Invitee', contact.invitee);
             contact.invitee.isOnline = true;
             contact.invitee.lastSeen = message.lastSeen;
+            contact.invitee.currentSocketId = message.currentSocketId;
           }
         });
       }
@@ -94,6 +125,25 @@ export default new Vuex.Store({
           }
         });
       }
+    },
+
+    deleteInvite(state, payload) {
+      state.currentUserContacts.splice(
+        state.currentUserContacts.findIndex(
+          (contact) => contact.id === payload.contactId
+        ),
+        1
+      );
+
+      // // get index of contact with id in payload
+      // const removeIndex = state.currentUserContacts
+      //   .map((contact) => {
+      //     contact.id;
+      //   })
+      //   .indexOf(payload.contactId);
+
+      // // remove contact
+      // state.currentUserContacts.splice(removeIndex, 1);
     },
     setLoading(state, payload) {
       state.loading = payload.loading;
@@ -180,6 +230,75 @@ export default new Vuex.Store({
     },
     SOCKET_NEWLOGIN({ commit }, payload) {
       console.log(payload, { commit });
+    },
+    async getContactMessages({ state }, payload) {
+      const res = await fetch(
+        `${config.serverURL}/chat/contacts/${payload.contactId}/messages`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${state.currentUser.token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      // console.log({ data, res, commit });
+      return data.messages;
+    },
+    async sendChatMessage({ state }, payload) {
+      const { messageText, senderId, recieverId, conversationId } = payload;
+      console.log(payload);
+      const res = await fetch(
+        `${config.serverURL}/chat/contacts/${conversationId}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${state.currentUser.token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            messageText,
+            senderId,
+            recieverId,
+            conversationId,
+          }),
+        }
+      );
+      const data = await res.json();
+      console.log({ data, res });
+      return data.messageContent;
+    },
+    async pingInvitee({ commit, state }, payload) {
+      const res = await fetch(
+        `${config.serverURL}/chat/contacts/${payload.contactId}/ping/${payload.inviteeId}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${state.currentUser.token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      console.log({ data, res });
+      console.log({ commit });
+      return data;
+    },
+    async deleteInvite({ commit, state }, payload) {
+      const res = await fetch(
+        `${config.serverURL}/chat/invites/${payload.contactId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            Authorization: `Bearer ${state.currentUser.token}`,
+          },
+        }
+      );
+      const data = await res.json();
+      console.log(data, res);
+      commit('deleteInvite', payload);
+      // console.log(commit, state, payload);
+      return { data };
     },
     updateUserContacts({ commit }, payload) {
       commit('updateCurrentUserContacts', payload);
