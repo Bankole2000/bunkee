@@ -8,20 +8,25 @@
     :class="{ 'rounded-xl': $vuetify.breakpoint.mdAndUp }"
   >
     <template v-slot:activator="{ on, attrs }">
-      <v-list-item-avatar color="grey" v-bind="attrs" v-on="on">
-        <v-img :src="user.profileImageUrl"></v-img>
-      </v-list-item-avatar>
+      <v-badge
+        bottom
+        :bordered="user.isOnline"
+        :color="user.isOnline ? 'success lighten-2' : 'grey'"
+        dot
+        offset-x="28"
+        offset-y="18"
+      >
+        <v-list-item-avatar color="grey" v-bind="attrs" v-on="on">
+          <v-img :src="user.profileImageUrl"></v-img>
+        </v-list-item-avatar>
+      </v-badge>
     </template>
     <v-card
       max-width="375"
       class="mx-auto"
       :class="{ 'rounded-xl': $vuetify.breakpoint.mdAndUp }"
     >
-      <v-img
-        src="https://cdn.vuetifyjs.com/images/lists/ali.png"
-        height="300px"
-        dark
-      >
+      <v-img :src="`${user.profileImageUrl}?s=600`" height="300px" dark>
         <v-row class="fill-height">
           <v-card-title>
             <v-btn dark icon @click="dialog = false">

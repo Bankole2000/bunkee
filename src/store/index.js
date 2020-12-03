@@ -245,6 +245,35 @@ export default new Vuex.Store({
       // console.log({ data, res, commit });
       return data.messages;
     },
+    async sendInviteResponse({ state }, payload) {
+      const { contactId, response } = payload;
+      const updateData = [];
+      let updateObject;
+      if (response) {
+        updateObject = [
+          { name: 'hasBeenAccepted', value: true },
+          { name: 'hasBeenDeclined', value: false },
+        ];
+      } else {
+        updateObject = [
+          { name: 'hasBeenDeclined', value: true },
+          { name: 'hasBeenAccepted', value: false },
+        ];
+      }
+      updateData.push(...updateObject);
+      const res = await fetch(`${config.serverURL}/chat/invites/${contactId}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${state.currentUser.token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updateData),
+      });
+      const data = await res.json();
+      // console.log(data, res);
+      return data;
+    },
     async sendChatMessage({ state }, payload) {
       const { messageText, senderId, recieverId, conversationId } = payload;
       console.log(payload);
@@ -269,6 +298,7 @@ export default new Vuex.Store({
       console.log({ data, res });
       return data.messageContent;
     },
+
     async pingInvitee({ commit, state }, payload) {
       const res = await fetch(
         `${config.serverURL}/chat/contacts/${payload.contactId}/ping/${payload.inviteeId}`,

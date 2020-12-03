@@ -620,3 +620,22 @@ export default new Vuex.Store({
   },
 })
 Registering a listener using Vuex is as simple as adding a mutation prefixed with SOCKET_. The text after this prefix is the name of our channel we want to listen to. To convert the listener from our previous example, which listened on the channel hello_world, we simply create a mutation named SOCKET_HELLO_WORLD. Our server’s response to our message can now be shared with our other components!
+
+Notifications: 
+  - Fields 
+    image, 
+    type of notification, 
+    when sent, 
+    primary info (title), 
+    secondary info (desc), 
+    details, 
+    link
+
+Notifications for: 
+  1. bell - Invite sent - on reciever side 
+  2. bell - ping sent - on reciever side 
+  3. bell - Invite accepted/decline - on sender side 
+  4. chat - message sent - on reciever side if dialog not opened 
+  5. email - Invite sent - reciever offline 
+  6. email (confirm) chat - message sent - reciever offline 
+  

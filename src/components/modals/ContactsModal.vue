@@ -65,7 +65,7 @@
                 </p>
               </v-card>
               <v-divider></v-divider>
-              <v-list subheader class="pb-n10 mb-n5">
+              <v-list subheader class="mb-0 pb-0">
                 <v-subheader class="headline font-weight-light pl-0 ml-8" inset
                   >Invites</v-subheader
                 >
@@ -79,11 +79,19 @@
                 <ChatModal :contact="contact" :key="contactModalKey" />
               </v-list>
 
-              <v-list subheader>
+              <v-list subheader class="mb-0 pb-0">
                 <v-divider></v-divider>
                 <v-subheader class="headline font-weight-light pl-0 ml-8" inset
                   >Contacts</v-subheader
                 >
+              </v-list>
+              <v-list
+                subheader
+                class="py-0"
+                v-for="contact in contacts"
+                :key="contact.id"
+              >
+                <ChatModal :contact="contact" :key="contactModalKey" />
               </v-list>
               <v-list class="py-0" subheader>
                 <v-divider></v-divider>
@@ -408,6 +416,14 @@ export default {
           !contact.hasBeenAccepted &&
           !contact.hasBeenDeclined &&
           !contact.isBlocked
+      );
+    },
+    contacts() {
+      return this.currentUserContacts.filter(
+        (contact) =>
+          contact.hasBeenAccepted &&
+          !contact.isBlocked &&
+          !contact.hasBeenDeclined
       );
     },
   },

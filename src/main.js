@@ -28,6 +28,7 @@ Vue.use(
 );
 Vue.use(VueMeta);
 Vue.use(Croppa);
+Vue.use(require('vue-moment'));
 
 Vue.filter('priceFilter', PriceFilter);
 new Vue({

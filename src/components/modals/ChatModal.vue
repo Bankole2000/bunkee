@@ -7,8 +7,9 @@
     >
       <v-badge
         bottom
-        :color="chattee.isOnline ? 'success' : 'grey'"
+        :color="chattee.isOnline ? 'success lighten-2' : 'grey'"
         dot
+        :bordered="chattee.isOnline"
         offset-x="28"
         offset-y="18"
       >
@@ -19,7 +20,21 @@
       <v-list-item-content>
         <v-list-item-title v-text="chattee.username"></v-list-item-title>
 
-        <v-list-item-subtitle v-text="chattee.isOnline"></v-list-item-subtitle>
+        <v-list-item-subtitle>
+          <span v-if="!isTyping"
+            ><span v-if="chattee.isOnline" class="primary--text text--lighten-1"
+              >Online</span
+            ><span v-else
+              >Last seen -
+              <span class="font-weight-bold">{{
+                chattee.lastSeen | moment('from')
+              }}</span></span
+            ></span
+          >
+          <span v-if="isTyping" class="success--text">
+            - <em>is typing...</em></span
+          >
+        </v-list-item-subtitle>
       </v-list-item-content>
 
       <v-list-item-action>
@@ -58,11 +73,15 @@
               <v-list-item-title class="subtitle-1 font-weight-bold">
                 @{{ chattee.username }}
               </v-list-item-title>
-              <v-list-item-subtitle>{{
-                chattee.isOnline
-                  ? `online`
-                  : `offline - Last seen ${chattee.lastSeen}`
-              }}</v-list-item-subtitle>
+              <v-list-item-subtitle v-if="chattee.isOnline"
+                >online
+              </v-list-item-subtitle>
+              <v-list-item-subtitle v-else class="font-weight-light"
+                >Last seen -
+                <span class="font-weight-bold">{{
+                  chattee.lastSeen | moment('from')
+                }}</span></v-list-item-subtitle
+              >
             </v-list-item-content>
             <v-list-item-action>
               <v-btn icon @click="dialog = false"
@@ -74,111 +93,67 @@
         <v-card-text
           ref="chatWindow"
           id="chatWindow"
-          class="chatWindow grey lighten-2 pt-4 pb-0 px-4 d-flex flex-column justify-start"
+          class="chatWindow grey lighten-2 pt-4 pb-4 px-4 d-flex flex-column justify-start"
           :style="
             $vuetify.breakpoint.mdAndUp
               ? 'min-height: 450px; max-height: 450px;'
               : ''
           "
         >
-          <!-- <v-list three-line subheader>
-            <v-subheader>User Controls</v-subheader>
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>Content filtering</v-list-item-title>
-                <v-list-item-subtitle
-                  >Set the content filtering level to restrict apps that can be
-                  downloaded</v-list-item-subtitle
-                >
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>Password</v-list-item-title>
-                <v-list-item-subtitle
-                  >Require password for purchase or use password to restrict
-                  purchase</v-list-item-subtitle
-                >
-              </v-list-item-content>
-            </v-list-item>
-          </v-list>
-          <v-divider></v-divider>
-          <v-list three-line subheader>
-            <v-subheader>General</v-subheader>
-            <v-list-item>
-              <v-list-item-action>
-                <v-checkbox v-model="notifications"></v-checkbox>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Notifications</v-list-item-title>
-                <v-list-item-subtitle
-                  >Notify me about updates to apps or games that I
-                  downloaded</v-list-item-subtitle
-                >
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item>
-              <v-list-item-action>
-                <v-checkbox v-model="sound"></v-checkbox>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Sound</v-list-item-title>
-                <v-list-item-subtitle
-                  >Auto-update apps at any time. Data charges may
-                  apply</v-list-item-subtitle
-                >
-              </v-list-item-content>
-            </v-list-item>
-            <v-list-item v-for="n in 10" :key="n">
-              <v-list-item-action>
-                <v-checkbox v-model="widgets"></v-checkbox>
-              </v-list-item-action>
-              <v-list-item-content>
-                <v-list-item-title>Auto-add widgets</v-list-item-title>
-                <v-list-item-subtitle
-                  >Automatically add home screen widgets</v-list-item-subtitle
-                >
-              </v-list-item-content>
-            </v-list-item>
-          </v-list> -->
           <div
-            class="px-4 py-2 my-2 text-center amber lighten-4 rounded-lg mx-auto caption"
+            style="max-width:150px;"
+            class="px-4 py-2 my-2 text-center blue lighten-4 rounded-lg mx-auto subtitle-2 text-uppercase"
           >
-            This is the beginning of your chat with
-            <span class="font-weight-bold">@{{ chattee.username }}</span>
-          </div>
-          <div
-            class="px-4 py-2 my-2 text-center blue lighten-4 rounded-lg mx-auto subtitle-2"
-          >
-            TODAY
-          </div>
+            {{
+              contact.createdAt
+                | moment('calendar', null, {
+                  sameDay: '[Today]',
 
-          <!-- <div
-            class="px-4 py-2 my-2 text-left success lighten-2 rounded-bl-xl rounded-tr-xl rounded-tl-xl ml-8"
-          >
-            So here's a bunch of text that somebody sent
-          </div> -->
-          <!-- <div>
-            <div>
-              <div>
-                <v-responsive
-                  class="px-4 py-2 my-2 rounded-tr-xl rounded-tl-xl white"
-                >
-                  <div class=""></div>
-                  <div>
-                    <v-img
-                      width="200"
-                      aspect-ratio="1"
-                      :src="require('@/assets/images/computerfamily.jpg')"
-                    ></v-img>
-                  </div>
-                </v-responsive>
-              </div>
-            </div>
-          </div> -->
+                  lastDay: '[Yesterday]',
+                  lastWeek: '[Last] dddd',
+                  sameElse: 'DD/MM/YYYY',
+                })
+            }}
+            <!--
+                  Moment Js Options
+                   {
+                      sameDay: '[Today]',
+                      nextDay: '[Tomorrow]',
+                      nextWeek: 'dddd',
+                      lastDay: '[Yesterday]',
+                      lastWeek: '[Last] dddd',
+                      sameElse: 'DD/MM/YYYY',
+                    } -->
+          </div>
 
           <v-slide-y-reverse-transition group>
             <div v-for="(message, i) in messages" :key="i">
+              <div
+                v-if="groupByDate(message.createdAt)"
+                style="max-width:150px;"
+                class="px-4 py-2 my-2 text-center blue lighten-4 rounded-lg mx-auto subtitle-2 text-uppercase"
+              >
+                {{
+                  message.createdAt
+                    | moment('calendar', null, {
+                      sameDay: '[Today]',
+
+                      lastDay: '[Yesterday]',
+                      lastWeek: '[Last] dddd',
+                      sameElse: 'DD/MM/YYYY',
+                    })
+                }}
+                <!--
+                  Moment Js Options
+                   {
+                      sameDay: '[Today]',
+                      nextDay: '[Tomorrow]',
+                      nextWeek: 'dddd',
+                      lastDay: '[Yesterday]',
+                      lastWeek: '[Last] dddd',
+                      sameElse: 'DD/MM/YYYY',
+                    } -->
+              </div>
               <div
                 class="d-flex"
                 :class="
@@ -199,7 +174,7 @@
                     <div class="d-flex flex-nowrap align-end">
                       <p
                         class="black--text mb-0 subtitle-1"
-                        style="word-break: break-all;"
+                        style="word-break: break-word;"
                         v-html="message.messageText"
                       >
                         {{ message.messageText }}
@@ -266,7 +241,7 @@
               class="d-flex pa-4 align-center justify-space-around"
             >
               <v-btn
-                @click="declineInvite(contact.id)"
+                @click="respondToInvite(contact.id, false)"
                 :loading="isLoadingCancel"
                 :disabled="buttonsBusy"
                 text
@@ -278,7 +253,7 @@
               </v-btn>
 
               <v-btn
-                @click="acceptInvite(contact.id)"
+                @click="respondToInvite(contact.id, true)"
                 :loading="isLoadingAccept"
                 :disabled="buttonsBusy"
                 text
@@ -291,7 +266,7 @@
             </v-row>
             <v-row
               v-if="isInviter"
-              class="d-flex pa-4 align-center justify-space-around"
+              class="d-flex px-4 pb-4 pt-0 align-center justify-space-around"
             >
               <v-btn
                 @click="cancelInvite(contact.id)"
@@ -302,7 +277,7 @@
                 class="text-capitalize"
               >
                 <v-icon left>mdi-cancel</v-icon>
-                Cancel
+                Cancel Invite
               </v-btn>
 
               <v-btn
@@ -315,14 +290,28 @@
               >
                 <v-icon left>mdi-bell-ring</v-icon>
                 Ping
-                <!-- <span class="font-weight-black"
-                    >@{{ contact.invitee.username }}</span
-                  > -->
               </v-btn>
             </v-row>
-            <!-- Pending Chat Invite - waiting to be accepted or declined -->
           </div>
+          <div
+            v-if="contact.hasBeenAccepted"
+            class="px-4 py-2 my-2 text-center amber lighten-4 rounded-lg mx-auto caption"
+          >
+            This is the beginning of your chat with
+            <span class="font-weight-bold">@{{ chattee.username }}</span>
+          </div>
+
+          <div class="d-flex justify-start"></div>
         </v-card-text>
+        <v-expand-transition>
+          <v-alert text color="success" v-show="isTyping" class="mb-0 py-2"
+            ><v-icon class="mdi-spin success-text" left>mdi-loading</v-icon
+            ><em
+              ><span class="font-weight-bold"> @{{ chattee.username }} </span>
+              is typing...
+            </em></v-alert
+          >
+        </v-expand-transition>
         <v-divider></v-divider>
         <v-card-actions class="grey lighten-1">
           <v-col cols="12">
@@ -359,8 +348,17 @@ export default {
     ProfileModal,
   },
   sockets: {
+    // isTyping: function(data) {
+    //   if (data.contactId == this.contact.id) this.isTyping = data.isTyping;
+    // },
+    userLogout: function(data) {
+      if (data.id == this.chattee.id) {
+        this.isTyping = false;
+      }
+    },
     chatMessage: function(data) {
       this.messages.push(data);
+      this.isTyping = false;
       if (this.dialog) {
         setTimeout(() => {
           console.log(this.$refs);
@@ -381,8 +379,6 @@ export default {
     },
     pingMessage: function(data) {
       this.messages.push(data);
-      // console.log(this.dialog);
-      // console.log(this.$refs);
       if (this.dialog) {
         setTimeout(() => {
           console.log(this.$refs);
@@ -400,8 +396,6 @@ export default {
         hasBeenRead: this.dialog,
         socketId: this.chattee.currentSocketId,
       });
-
-      // this.$refs.chatWindow.scrollTop += 1;
     },
     allRead: function(data) {
       this.messages.forEach((message) => {
@@ -411,9 +405,6 @@ export default {
         }
       });
     },
-    // chatMessage: function(data) {
-    //   console.log(data);
-    // },
   },
   data() {
     return {
@@ -430,12 +421,14 @@ export default {
       widgets: false,
       isInviter: null,
       isInvitee: null,
+      isTyping: false,
+      temp: {
+        old_unique_date: null,
+      },
     };
   },
   watch: {
     dialog: function(newValue /*, oldValue*/) {
-      // console.log({ oldValue, newValue });
-
       if (newValue) {
         this.$socket.emit('allRead', {
           contactId: this.contact.id,
@@ -462,11 +455,28 @@ export default {
       'pingInvitee',
       'getContactMessages',
       'sendChatMessage',
+      'sendInviteResponse',
     ]),
+    groupByDate(date) {
+      var old_date = this.temp.old_unique_date;
+      var new_date = new Date(date).getDate();
+      if (old_date != new_date) {
+        this.temp.old_unique_date = new_date;
+        return true;
+      }
+      return false;
+    },
+    showTyping() {
+      this.$socket.emit('isTyping', {
+        chattee: this.chattee,
+        chatter: this.chatter,
+        contactId: this.contact.id,
+        isTyping: true,
+      });
+    },
     cancelInvite(id) {
       this.buttonsBusy = true;
       this.isLoadingCancel = true;
-      // console.log(id);
       this.deleteInvite({ contactId: id })
         .then(() => {
           this.dialog = false;
@@ -506,63 +516,54 @@ export default {
         this.isLoadingPing = false;
         this.buttonsBusy = false;
       });
-      // console.log(id);
-      // setTimeout(() => {
-      // }, 1000);
     },
-    acceptInvite(id) {
+    respondToInvite(id, response) {
       this.buttonsBusy = true;
-      this.isLoadingAccept = true;
-      console.log(id);
+      response ? (this.isLoadingAccept = true) : (this.isLoadingCancel = true);
+      console.log(id, response);
+      this.sendInviteResponse({ contactId: id, response });
+
       setTimeout(() => {
+        this.isLoadingCancel = false;
         this.isLoadingAccept = false;
         this.buttonsBusy = false;
       }, 1000);
     },
-    declineInvite(id) {
+    blockChattee(id, blocked) {
       this.buttonsBusy = true;
-      this.isLoadingCancel = true;
-      console.log(id);
-      setTimeout(() => {
-        this.isLoadingCancel = false;
-        this.buttonsBusy = false;
-      }, 1000);
+      console.log(id, blocked);
     },
     sendMessage() {
       const message = {};
       message.messageText = this.chatMessage;
-      // message.createdAt = new Date(Date.now());
-      // message.senderId = this.loggedInUser.id;
-      // message.recieverId = this.chattee.id;
-      // message.contactId = this.contact.id;
-      // message.hasBeenDelivered = false;
-      // message.hasBeenRead = false;
       this.sendChatMessage({
         messageText: message.messageText,
         senderId: this.loggedInUser.id,
         recieverId: this.chattee.id,
         conversationId: this.contact.id,
-      }).then((message) => {
-        this.messages.push(message);
+      })
+        .then((message) => {
+          this.messages.push(message);
 
-        this.$socket.emit('chatMessage', { message, chattee: this.chattee });
-      });
-      // console.log({ message: this.chatMessage });
+          this.$socket.emit('chatMessage', { message, chattee: this.chattee });
+        })
+        .then(() => {
+          // this.$socket.emit('isTyping', {
+          //   chattee: this.chattee,
+          //   chatter: this.chatter,
+          //   contactId: this.contact.id,
+          //   isTyping: false,
+          // });
+        });
       this.chatMessage = '';
-      // console.log(this.$refs);
-
-      // let i;
-      // while (i < 200) {
       setTimeout(() => {
         console.log(this.$refs);
-        // this.$refs.chatWindow.scrollTop += 1;
         this.$refs.chatWindow.scrollBy({
           top: this.$refs.chatWindow.scrollHeight + 200,
           left: 0,
           behaviour: 'smooth',
         });
       }, 200);
-      // i + 1;
     },
     sendImageWithMessage() {
       console.log('Send Image with message');
@@ -589,16 +590,17 @@ export default {
     // console.log(this.$props);
     // console.log(this.$socket.connect().connected);
   },
-  async created() {
+  created() {
+    this.getContactMessages({ contactId: this.contact.id }).then((data) => {
+      this.messages = data;
+    });
     if (this.contact.inviterId == this.loggedInUser.id) {
       this.isInviter = true;
     } else {
       this.isInvitee = true;
     }
-    this.getContactMessages({ contactId: this.contact.id }).then((data) => {
-      this.messages = data;
-    });
   },
+  beforeCreate() {},
 };
 </script>
 
