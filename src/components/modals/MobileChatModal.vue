@@ -20,7 +20,7 @@
         :class="{ 'rounded-xl': $vuetify.breakpoint.mdAndUp }"
       >
         <v-card-title class="primary pa-0" elevation="1">
-          <v-list-item>
+          <v-list-item v-if="loggedInUser">
             <v-list-item-avatar color="grey">
               <v-img :src="loggedInUser.profileImageUrl"></v-img>
             </v-list-item-avatar>
@@ -40,6 +40,26 @@
                 }}</v-list-item-subtitle
               >
             </v-list-item-content>
+            <v-list-item-action>
+              <v-btn icon @click="dialog = false"
+                ><v-icon>mdi-close</v-icon></v-btn
+              >
+            </v-list-item-action>
+          </v-list-item>
+          <v-list-item v-else>
+            <v-list-item-avatar color="grey">
+              <!-- TODO: get default not logged in user image -->
+              <!-- <v-img :src="loggedInUser.profileImageUrl"></v-img> -->
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title class="subtitle-1 font-weight-bold"
+                >Not Logged In</v-list-item-title
+              >
+              <v-list-item-subtitle
+                >Login to Join the chat</v-list-item-subtitle
+              >
+            </v-list-item-content>
+
             <v-list-item-action>
               <v-btn icon @click="dialog = false"
                 ><v-icon>mdi-close</v-icon></v-btn

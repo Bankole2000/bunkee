@@ -20,7 +20,7 @@
         :class="{ 'rounded-xl': $vuetify.breakpoint.mdAndUp }"
       >
         <v-card-title class="primary pa-0" elevation="1">
-          <v-list-item>
+          <v-list-item v-if="loggedInUser">
             <v-list-item-avatar color="grey">
               <v-img :src="loggedInUser.profileImageUrl"></v-img>
             </v-list-item-avatar>
@@ -46,6 +46,26 @@
               >
             </v-list-item-action>
           </v-list-item>
+          <v-list-item v-else>
+            <v-list-item-avatar color="grey">
+              <!-- TODO: get default not logged in user image -->
+              <!-- <v-img :src="loggedInUser.profileImageUrl"></v-img> -->
+            </v-list-item-avatar>
+            <v-list-item-content>
+              <v-list-item-title class="subtitle-1 font-weight-bold"
+                >Not Logged In</v-list-item-title
+              >
+              <v-list-item-subtitle
+                >Login to Join the chat</v-list-item-subtitle
+              >
+            </v-list-item-content>
+
+            <v-list-item-action>
+              <v-btn icon @click="dialog = false"
+                ><v-icon>mdi-close</v-icon></v-btn
+              >
+            </v-list-item-action>
+          </v-list-item>
         </v-card-title>
 
         <v-card-text
@@ -58,48 +78,63 @@
         >
           <v-window v-model="step">
             <v-window-item :value="0">
-              <!-- <MobileSingleChatModal class="mt-4" /> -->
               <v-card elevation="0" class="d-flex align-center justify-center"
                 ><p class="mb-0 text-h5 font-weight-light pa-4">
                   Your Contacts
                 </p>
               </v-card>
               <v-divider></v-divider>
-              <v-list subheader class="mb-0 pb-0">
-                <v-subheader class="headline font-weight-light pl-0 ml-8" inset
-                  >Invites</v-subheader
+              <div v-if="loggedInUser">
+                <v-list subheader class="mb-0 pb-0">
+                  <v-subheader
+                    class="headline font-weight-light pl-0 ml-8"
+                    inset
+                    >Invites</v-subheader
+                  >
+                </v-list>
+                <v-list
+                  subheader
+                  class="py-0"
+                  v-for="contact in invites"
+                  :key="contact.id"
                 >
-              </v-list>
-              <v-list
-                subheader
-                class="py-0"
-                v-for="contact in invites"
-                :key="contact.id"
-              >
-                <ChatModal :contact="contact" :key="contactModalKey" />
-              </v-list>
+                  <ChatModal :contact="contact" :key="contactModalKey" />
+                </v-list>
+                <v-list subheader class="mb-0 pb-0">
+                  <v-divider></v-divider>
+                  <v-subheader
+                    class="headline font-weight-light pl-0 ml-8"
+                    inset
+                    >Contacts</v-subheader
+                  >
+                </v-list>
+                <v-list
+                  subheader
+                  class="py-0"
+                  v-for="contact in contacts"
+                  :key="contact.id"
+                >
+                  <ChatModal :contact="contact" :key="contactModalKey" />
+                </v-list>
+                <v-list class="py-0" subheader>
+                  <v-divider></v-divider>
 
-              <v-list subheader class="mb-0 pb-0">
-                <v-divider></v-divider>
-                <v-subheader class="headline font-weight-light pl-0 ml-8" inset
-                  >Contacts</v-subheader
+                  <v-subheader
+                    class="headline font-weight-light pl-0 ml-8"
+                    inset
+                    >Blocked</v-subheader
+                  >
+                </v-list>
+                <v-list
+                  subheader
+                  class="py-0"
+                  v-for="contact in blocked"
+                  :key="contact.id"
                 >
-              </v-list>
-              <v-list
-                subheader
-                class="py-0"
-                v-for="contact in contacts"
-                :key="contact.id"
-              >
-                <ChatModal :contact="contact" :key="contactModalKey" />
-              </v-list>
-              <v-list class="py-0" subheader>
-                <v-divider></v-divider>
-
-                <v-subheader class="headline font-weight-light pl-0 ml-8" inset
-                  >Blocked</v-subheader
-                >
-              </v-list>
+                  <ChatModal :contact="contact" :key="contactModalKey" />
+                </v-list>
+              </div>
+              <div v-else>You are not logged in</div>
               <!-- <v-list
                 subheader
                 class="py-0"
@@ -411,27 +446,44 @@ export default {
   computed: {
     ...mapGetters(['loggedInUser', 'currentUserContacts']),
     invites() {
-      return this.currentUserContacts.filter(
-        (contact) =>
-          !contact.hasBeenAccepted &&
-          !contact.hasBeenDeclined &&
-          !contact.isBlocked
-      );
+      if (this.loggedInUser) {
+        return this.currentUserContacts.filter(
+          (contact) =>
+            !contact.hasBeenAccepted &&
+            !contact.hasBeenDeclined &&
+            !contact.isBlocked
+        );
+      } else {
+        return [];
+      }
     },
     contacts() {
-      return this.currentUserContacts.filter(
-        (contact) =>
-          contact.hasBeenAccepted &&
-          !contact.isBlocked &&
-          !contact.hasBeenDeclined
-      );
+      if (this.loggedInUser) {
+        return this.currentUserContacts.filter(
+          (contact) =>
+            contact.hasBeenAccepted &&
+            !contact.isBlocked &&
+            !contact.hasBeenDeclined
+        );
+      } else {
+        return [];
+      }
+    },
+    blocked() {
+      if (this.loggedInUser) {
+        return this.currentUserContacts.filter((contact) => {
+          contact.isBlocked;
+        });
+      } else {
+        return [];
+      }
     },
   },
   beforeMount() {
     this.forceRerender();
   },
   mounted() {
-    console.log(this.invites);
+    // console.log(this.invites);
   },
 };
 </script>

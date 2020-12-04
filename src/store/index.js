@@ -110,7 +110,7 @@ export default new Vuex.Store({
       }
     },
     SOCKET_userLogout(state, message) {
-      console.log(state.currentUserContacts, message);
+      // console.log(state.currentUserContacts, message);
       if (state.currentUserContacts) {
         state.currentUserContacts.forEach((contact) => {
           if (contact.inviter.uuid == message.uuid) {

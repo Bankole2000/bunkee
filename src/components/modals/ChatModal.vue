@@ -18,10 +18,9 @@
         </v-list-item-avatar>
       </v-badge>
       <v-list-item-content>
-        <v-list-item-title v-text="chattee.username"></v-list-item-title>
-
-        <v-list-item-subtitle>
-          <span v-if="!isTyping"
+        <v-list-item-title
+          >@{{ chattee.username }} &middot;
+          <span class="caption"
             ><span v-if="chattee.isOnline" class="primary--text text--lighten-1"
               >Online</span
             ><span v-else
@@ -30,25 +29,90 @@
                 chattee.lastSeen | moment('from')
               }}</span></span
             ></span
-          >
+          ></v-list-item-title
+        >
+
+        <v-list-item-subtitle>
           <span v-if="isTyping" class="success--text">
-            - <em>is typing...</em></span
+            - <em>is typing...</em> </span
+          ><span v-else
+            ><v-icon
+              size="18"
+              class="mr-1"
+              :class="{ 'info--text': lastMessage.hasBeenRead }"
+              v-if="lastMessage.senderId == loggedInUser.id"
+              >{{
+                lastMessage.hasBeenDelivered ? ' mdi-check-all' : 'mdi-check'
+              }}</v-icon
+            ></span
           >
+          <span
+            v-if="!isTyping"
+            :class="{
+              'font-weight-black':
+                !lastMessage.hasBeenRead &&
+                lastMessage.senderId !== loggedInUser.id,
+            }"
+            v-html="lastMessage.messageText"
+          >
+          </span>
         </v-list-item-subtitle>
       </v-list-item-content>
 
       <v-list-item-action>
+        <!-- TODO: change time ago minutes to m, days to d, seconds to s etc -->
+        <!-- TODO: render conditionals -->
         <v-list-item-action-text
-          ><v-btn small fab v-if="isInviter" text color="info">
+          >{{
+            new Date(lastMessage.createdAt).toLocaleString(['en-US'], {
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            })
+          }}<v-btn
+            small
+            fab
+            v-if="
+              isInviter && !contact.hasBeenAccepted && !contact.hasBeenDeclined
+            "
+            text
+            color="info"
+          >
             <v-icon>mdi-arrow-right</v-icon>
           </v-btn>
-          <v-btn small fab v-if="isInvitee" text color="success">
+          <v-btn
+            small
+            fab
+            v-if="
+              isInvitee && !contact.hasBeenAccepted && !contact.hasBeenDeclined
+            "
+            text
+            color="success"
+          >
             <v-icon>mdi-arrow-left</v-icon>
           </v-btn></v-list-item-action-text
         >
-        <!-- <v-chip class="mb-2 ml-0" small color="primary">
-          {{ Math.floor(Math.random() * 100) }}
-        </v-chip> -->
+
+        <v-chip
+          class="mb-0 ml-0"
+          small
+          color="primary"
+          :style="[
+            messages.filter(
+              (message) =>
+                message.recieverId == loggedInUser.id && !message.hasBeenRead
+            ).length > 0
+              ? { visibility: 'visible' }
+              : { visibility: 'hidden' },
+          ]"
+        >
+          {{
+            messages.filter(
+              (message) =>
+                message.recieverId == loggedInUser.id && !message.hasBeenRead
+            ).length
+          }}
+        </v-chip>
       </v-list-item-action>
     </v-list-item>
 
@@ -73,14 +137,21 @@
               <v-list-item-title class="subtitle-1 font-weight-bold">
                 @{{ chattee.username }}
               </v-list-item-title>
-              <v-list-item-subtitle v-if="chattee.isOnline"
+              <v-list-item-subtitle v-if="chattee.isOnline && !isTyping"
                 >online
               </v-list-item-subtitle>
-              <v-list-item-subtitle v-else class="font-weight-light"
+              <v-list-item-subtitle
+                v-else-if="!chattee.isOnline"
+                class="font-weight-light"
                 >Last seen -
                 <span class="font-weight-bold">{{
                   chattee.lastSeen | moment('from')
                 }}</span></v-list-item-subtitle
+              >
+              <v-list-item-subtitle v-else-if="isTyping"
+                ><em class="info--text text--lighten-2"
+                  >typing...</em
+                ></v-list-item-subtitle
               >
             </v-list-item-content>
             <v-list-item-action>
@@ -125,6 +196,13 @@
                       sameElse: 'DD/MM/YYYY',
                     } -->
           </div>
+          <div
+            v-if="contact.hasBeenAccepted"
+            class="px-4 py-2 my-2 text-center amber lighten-4 rounded-lg mx-auto caption"
+          >
+            This is the beginning of your chat with
+            <span class="font-weight-bold">@{{ chattee.username }}</span>
+          </div>
 
           <v-slide-y-reverse-transition group>
             <div v-for="(message, i) in messages" :key="i">
@@ -143,16 +221,6 @@
                       sameElse: 'DD/MM/YYYY',
                     })
                 }}
-                <!--
-                  Moment Js Options
-                   {
-                      sameDay: '[Today]',
-                      nextDay: '[Tomorrow]',
-                      nextWeek: 'dddd',
-                      lastDay: '[Yesterday]',
-                      lastWeek: '[Last] dddd',
-                      sameElse: 'DD/MM/YYYY',
-                    } -->
               </div>
               <div
                 class="d-flex"
@@ -293,25 +361,34 @@
               </v-btn>
             </v-row>
           </div>
-          <div
-            v-if="contact.hasBeenAccepted"
-            class="px-4 py-2 my-2 text-center amber lighten-4 rounded-lg mx-auto caption"
-          >
-            This is the beginning of your chat with
-            <span class="font-weight-bold">@{{ chattee.username }}</span>
-          </div>
-
-          <div class="d-flex justify-start"></div>
+          <!-- <v-expand-transition>
+            <div class="d-flex justify-start">
+              <div v-show="isTyping == true">
+                <v-responsive
+                  class="pr-4 pl-2 py-0 my-2 rounded-tr-xl rounded-tl-xl white rounded-br-xl mr-8"
+                >
+                  <div class="d-flex flex-nowrap align-center">
+                    <div class="lds-ellipsis">
+                      <div></div>
+                      <div></div>
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                </v-responsive>
+              </div>
+            </div>
+          </v-expand-transition> -->
         </v-card-text>
-        <v-expand-transition>
-          <v-alert text color="success" v-show="isTyping" class="mb-0 py-2"
+
+        <!-- <v-alert text color="success" v-show="isTyping" class="mb-0 py-2"
             ><v-icon class="mdi-spin success-text" left>mdi-loading</v-icon
             ><em
               ><span class="font-weight-bold"> @{{ chattee.username }} </span>
               is typing...
             </em></v-alert
-          >
-        </v-expand-transition>
+          > -->
+
         <v-divider></v-divider>
         <v-card-actions class="grey lighten-1">
           <v-col cols="12">
@@ -328,11 +405,9 @@
               append-icon="mdi-send"
               single-line
               placeholder="Type a message. Hit 'Enter' to send"
-              v-model="chatMessage"
+              v-model="chatMessageText"
             ></v-text-field>
           </v-col>
-          <!-- <v-spacer></v-spacer>
-          <v-btn>Save</v-btn> -->
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -349,7 +424,8 @@ export default {
   },
   sockets: {
     // isTyping: function(data) {
-    //   if (data.contactId == this.contact.id) this.isTyping = data.isTyping;
+    //   console.log(data);
+    //   data.isTyping == true ? (this.isTyping = true) : (this.isTyping = false);
     // },
     userLogout: function(data) {
       if (data.id == this.chattee.id) {
@@ -414,7 +490,7 @@ export default {
       isLoadingAccept: false,
       isLoadingPing: false,
       notifications: false,
-      chatMessage: '',
+      chatMessageText: '',
       messages: [],
       selected: '',
       sound: true,
@@ -437,6 +513,11 @@ export default {
           hasBeenRead: true,
           socketId: this.chattee.currentSocketId,
         });
+        this.messages.forEach((message) => {
+          if (message.senderId != this.loggedInUser.id) {
+            message.hasBeenRead = true;
+          }
+        });
         setTimeout(() => {
           console.log(this.$refs);
           this.$refs.chatWindow.scrollBy({
@@ -447,6 +528,27 @@ export default {
         }, 200);
       }
     },
+    // chatMessageText: function(newValue, oldValue) {
+    //   // console.log(newValue, oldValue.length);
+    //   if (newValue.length > 0 && oldValue.length == 0) {
+    //     this.$socket.emit('typing', {
+    //       socketId: this.chattee.currentSocketId,
+    //       isTyping: true,
+    //     });
+    //   }
+    //   if (newValue.length == 0) {
+    //     this.$socket.emit('typing', {
+    //       socketId: this.chattee.currentSocketId,
+    //       isTyping: false,
+    //     });
+    //   }
+    //   // else {
+    //   //   this.$socket.emit('typing', {
+    //   //     socketId: this.chattee.currentSocketId,
+    //   //     isTyping: false,
+    //   //   });
+    //   // }
+    // },
   },
   methods: {
     ...mapActions([
@@ -466,12 +568,11 @@ export default {
       }
       return false;
     },
-    showTyping() {
-      this.$socket.emit('isTyping', {
-        chattee: this.chattee,
-        chatter: this.chatter,
-        contactId: this.contact.id,
-        isTyping: true,
+    showTyping(status) {
+      console.log(this.chattee.currentSocketId);
+      this.$socket.emit('typing', {
+        socketId: this.chattee.currentSocketId,
+        isTyping: status,
       });
     },
     cancelInvite(id) {
@@ -521,7 +622,9 @@ export default {
       this.buttonsBusy = true;
       response ? (this.isLoadingAccept = true) : (this.isLoadingCancel = true);
       console.log(id, response);
-      this.sendInviteResponse({ contactId: id, response });
+      this.sendInviteResponse({ contactId: id, response }).then((data) => {
+        console.log(data);
+      });
 
       setTimeout(() => {
         this.isLoadingCancel = false;
@@ -535,35 +638,25 @@ export default {
     },
     sendMessage() {
       const message = {};
-      message.messageText = this.chatMessage;
+      message.messageText = this.chatMessageText;
       this.sendChatMessage({
         messageText: message.messageText,
         senderId: this.loggedInUser.id,
         recieverId: this.chattee.id,
         conversationId: this.contact.id,
-      })
-        .then((message) => {
-          this.messages.push(message);
-
-          this.$socket.emit('chatMessage', { message, chattee: this.chattee });
-        })
-        .then(() => {
-          // this.$socket.emit('isTyping', {
-          //   chattee: this.chattee,
-          //   chatter: this.chatter,
-          //   contactId: this.contact.id,
-          //   isTyping: false,
-          // });
-        });
-      this.chatMessage = '';
-      setTimeout(() => {
-        console.log(this.$refs);
-        this.$refs.chatWindow.scrollBy({
-          top: this.$refs.chatWindow.scrollHeight + 200,
-          left: 0,
-          behaviour: 'smooth',
-        });
-      }, 200);
+      }).then((message) => {
+        this.chatMessageText = '';
+        this.messages.push(message);
+        setTimeout(() => {
+          // console.log(this.$refs);
+          this.$refs.chatWindow.scrollBy({
+            top: this.$refs.chatWindow.scrollHeight + 200,
+            left: 0,
+            behaviour: 'smooth',
+          });
+        }, 200);
+        this.$socket.emit('chatMessage', { message, chattee: this.chattee });
+      });
     },
     sendImageWithMessage() {
       console.log('Send Image with message');
@@ -585,6 +678,13 @@ export default {
         return this.contact.invitee;
       }
     },
+    lastMessage() {
+      if (this.messages.length > 0) {
+        return this.messages[this.messages.length - 1];
+      } else {
+        return {};
+      }
+    },
   },
   mounted() {
     // console.log(this.$props);
@@ -604,8 +704,64 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .chatWindow {
   scroll-behavior: smooth;
+}
+.lds-ellipsis {
+  display: inline-block;
+  position: relative;
+  width: 70px;
+  height: 40px;
+}
+.lds-ellipsis div {
+  position: absolute;
+  top: 16px;
+  width: 10px;
+  height: 10px;
+  /* opacity: 0.5; */
+  border-radius: 50%;
+  background: #ff0898;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.lds-ellipsis div:nth-child(1) {
+  left: 8px;
+  animation: lds-ellipsis1 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(2) {
+  left: 8px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(3) {
+  left: 32px;
+  animation: lds-ellipsis2 0.6s infinite;
+}
+.lds-ellipsis div:nth-child(4) {
+  left: 56px;
+  animation: lds-ellipsis3 0.6s infinite;
+}
+@keyframes lds-ellipsis1 {
+  0% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes lds-ellipsis3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes lds-ellipsis2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
 }
 </style>
