@@ -8,6 +8,7 @@ export default new Vuex.Store({
   state: {
     connected: null,
     loading: false,
+    userDirectory: [],
     currentUser: null,
     currentUserContacts: null,
     currentUserListings: null,
@@ -60,6 +61,9 @@ export default new Vuex.Store({
     },
     SOCKET_ERROR(state, message) {
       state.error = message.error;
+    },
+    setUserDirectory(state, payload) {
+      state.userDirectory = payload;
     },
     // SOCKET_pingMessage(state, data) {
     //   state.currentUserContacts.forEach((contact) => {
@@ -230,6 +234,11 @@ export default new Vuex.Store({
     },
     SOCKET_NEWLOGIN({ commit }, payload) {
       console.log(payload, { commit });
+    },
+    async getAllUsers({ commit }) {
+      const res = await fetch(`${config.serverURL}/users`);
+      const data = await res.json();
+      commit('setUserDirectory', data.users);
     },
     async getContactMessages({ state }, payload) {
       const res = await fetch(
@@ -562,6 +571,9 @@ export default new Vuex.Store({
     },
   },
   getters: {
+    userDirectory(state) {
+      return state.userDirectory;
+    },
     currentUserListings(state) {
       return state.currentUserListings;
     },

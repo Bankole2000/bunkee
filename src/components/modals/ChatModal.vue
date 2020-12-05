@@ -205,9 +205,14 @@
           </div>
 
           <v-slide-y-reverse-transition group>
-            <div v-for="(message, i) in messages" :key="i">
+            <div v-for="(message, i) in chatMessages" :key="i">
+              <!-- v-if="groupByDate(message.createdAt)" -->
               <div
-                v-if="groupByDate(message.createdAt)"
+                v-if="
+                  i != 0 &&
+                    new Date(message.createdAt).getDate() !=
+                      new Date(chatMessages[i - 1 || 0].createdAt).getDate()
+                "
                 style="max-width:150px;"
                 class="px-4 py-2 my-2 text-center blue lighten-4 rounded-lg mx-auto subtitle-2 text-uppercase"
               >
@@ -255,7 +260,8 @@
                             ? 'text-left ml-4'
                             : 'text-right ml-4'
                         "
-                        >{{
+                      >
+                        {{
                           new Date(message.createdAt).toLocaleString(
                             ['en-US'],
                             {
@@ -423,10 +429,10 @@ export default {
     ProfileModal,
   },
   sockets: {
-    // isTyping: function(data) {
-    //   console.log(data);
-    //   data.isTyping == true ? (this.isTyping = true) : (this.isTyping = false);
-    // },
+    isTyping: function(data) {
+      console.log(data);
+      data.isTyping == true ? (this.isTyping = true) : (this.isTyping = false);
+    },
     userLogout: function(data) {
       if (data.id == this.chattee.id) {
         this.isTyping = false;
@@ -436,6 +442,13 @@ export default {
       this.messages.push(data);
       this.isTyping = false;
       if (this.dialog) {
+        this.$socket.emit('allRead', {
+          contactId: this.contact.id,
+          senderId: data.senderId,
+          hasBeenDelivered: true,
+          hasBeenRead: this.dialog ? true : false,
+          socketId: this.chattee.currentSocketId,
+        });
         setTimeout(() => {
           console.log(this.$refs);
           this.$refs.chatWindow.scrollBy({
@@ -445,13 +458,6 @@ export default {
           });
         }, 200);
       }
-      this.$socket.emit('allRead', {
-        contactId: this.contact.id,
-        senderId: data.senderId,
-        hasBeenDelivered: true,
-        hasBeenRead: this.dialog ? true : false,
-        socketId: this.chattee.currentSocketId,
-      });
     },
     pingMessage: function(data) {
       this.messages.push(data);
@@ -476,8 +482,12 @@ export default {
     allRead: function(data) {
       this.messages.forEach((message) => {
         if (!message.hasBeenDelivered || !message.hasBeenRead) {
+          // if (message.senderId != this.loggedInUser.id) {
           message.hasBeenDelivered = data.hasBeenDelivered;
           message.hasBeenRead = data.hasBeenRead;
+          // }
+          this.lastMessage.hasBeenDelivered = data.hasBeenDelivered;
+          this.lastMessage.hasBeenRead = data.hasBeenRead;
         }
       });
     },
@@ -528,27 +538,27 @@ export default {
         }, 200);
       }
     },
-    // chatMessageText: function(newValue, oldValue) {
-    //   // console.log(newValue, oldValue.length);
-    //   if (newValue.length > 0 && oldValue.length == 0) {
-    //     this.$socket.emit('typing', {
-    //       socketId: this.chattee.currentSocketId,
-    //       isTyping: true,
-    //     });
-    //   }
-    //   if (newValue.length == 0) {
-    //     this.$socket.emit('typing', {
-    //       socketId: this.chattee.currentSocketId,
-    //       isTyping: false,
-    //     });
-    //   }
-    //   // else {
-    //   //   this.$socket.emit('typing', {
-    //   //     socketId: this.chattee.currentSocketId,
-    //   //     isTyping: false,
-    //   //   });
-    //   // }
-    // },
+    chatMessageText: function(newValue, oldValue) {
+      // console.log(newValue, oldValue.length);
+      if (newValue.length > 0 && oldValue.length == 0) {
+        this.$socket.emit('typing', {
+          socketId: this.chattee.currentSocketId,
+          isTyping: true,
+        });
+      }
+      if (newValue.length == 0) {
+        this.$socket.emit('typing', {
+          socketId: this.chattee.currentSocketId,
+          isTyping: false,
+        });
+      }
+      // else {
+      //   this.$socket.emit('typing', {
+      //     socketId: this.chattee.currentSocketId,
+      //     isTyping: false,
+      //   });
+      // }
+    },
   },
   methods: {
     ...mapActions([
@@ -685,8 +695,15 @@ export default {
         return {};
       }
     },
+    chatMessages() {
+      return this.messages;
+    },
   },
+  beforeMount() {},
   mounted() {
+    // this.getContactMessages({ contactId: this.contact.id }).then((data) => {
+    //   this.messages = data;
+    // });
     // console.log(this.$props);
     // console.log(this.$socket.connect().connected);
   },

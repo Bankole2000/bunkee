@@ -225,6 +225,26 @@
                 </p>
               </v-card>
               <v-divider></v-divider>
+              <v-list>
+                <v-list-item v-for="(user, i) in allUsersDirectory" :key="i">
+                  <v-list-item-avatar color="grey">
+                    <!-- TODO: get default not logged in user image -->
+                    <v-img :src="user.profileImageUrl"></v-img>
+                  </v-list-item-avatar>
+                  <v-list-item-content>
+                    <v-list-item-title class="subtitle-1 font-weight-bold"
+                      >@{{ user.username }}</v-list-item-title
+                    >
+                    <v-list-item-subtitle
+                      >Login to Join the chat</v-list-item-subtitle
+                    >
+                  </v-list-item-content>
+                  <v-list-item-action>
+                    <v-btn icon><v-icon>mdi-close</v-icon></v-btn>
+                  </v-list-item-action>
+                </v-list-item>
+              </v-list>
+              <v-divider></v-divider>
             </v-window-item>
           </v-window>
         </v-card-text>
@@ -278,6 +298,7 @@ export default {
     return {
       selected: [2],
       step: 0,
+      users: [],
       contactModalKey: 0,
       dialog: false,
       notifications: false,
@@ -402,7 +423,7 @@ export default {
     };
   },
   methods: {
-    ...mapActions(['updateUserContacts']),
+    ...mapActions(['updateUserContacts', 'getAllUsers']),
     forceRerender() {
       this.contactModalKey += 1;
     },
@@ -444,7 +465,7 @@ export default {
     // },
   },
   computed: {
-    ...mapGetters(['loggedInUser', 'currentUserContacts']),
+    ...mapGetters(['loggedInUser', 'currentUserContacts', 'userDirectory']),
     invites() {
       if (this.loggedInUser) {
         return this.currentUserContacts.filter(
@@ -478,12 +499,20 @@ export default {
         return [];
       }
     },
+    allUsersDirectory() {
+      return this.loggedInUser
+        ? this.userDirectory.filter((user) => user.id != this.loggedInUser.id)
+        : this.userDirectory;
+    },
   },
   beforeMount() {
     this.forceRerender();
   },
   mounted() {
     // console.log(this.invites);
+  },
+  created() {
+    this.getAllUsers();
   },
 };
 </script>
