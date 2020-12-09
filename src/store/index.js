@@ -6,13 +6,38 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
+    io: null,
     connected: null,
     loading: false,
     userDirectory: [],
     currentUser: null,
-    currentUserContacts: null,
+    currentUserContacts: [],
     currentUserListings: null,
     listingInCreation: null,
+    ntoast: {
+      show: false,
+      sender: '',
+      timeout: '',
+      message: '',
+      imgUrl: '',
+      icons: {
+        success: 'mdi-check',
+        warning: 'mdi-alert',
+        error: 'mdi-window-close',
+        info: 'mdi-information',
+        like: 'mdi-heart',
+        chatInvite: 'mdi-forum',
+        listingInvite: 'mdi-home-account',
+        offerInvite: 'mdi-account-group',
+      },
+      icon: '',
+      colors: {
+        like: 'red',
+        chatInvite: 'primary',
+        listingInvite: 'info',
+        offerInvite: 'warning',
+      },
+    },
     toast: {
       sclass: '',
       message: '',
@@ -62,6 +87,54 @@ export default new Vuex.Store({
     SOCKET_ERROR(state, message) {
       state.error = message.error;
     },
+    SOCKET_inviteResponse(state, data) {
+      console.log(data);
+      state.currentUserContacts.forEach((contact) => {
+        if (contact.uuid == data.data.invite.uuid) {
+          data.data.invite.hasBeenAccepted
+            ? (contact.hasBeenAccepted = data.data.invite.hasBeenAccepted)
+            : false;
+          data.data.invite.hasBeenDeclined
+            ? (contact.hasBeenDeclined = data.data.invite.hasBeenDeclined)
+            : false;
+          data.data.invite.isBlocked
+            ? (contact.isBlocked = data.data.invite.isBlocked)
+            : false;
+        }
+        if (data.data.notification) {
+          state.currentUser.recievedNotifications.push(data.data.notification);
+        }
+      });
+    },
+    SOCKET_allRead(state, data) {
+      console.log(data, state);
+      const contact = state.currentUserContacts.find(
+        (contact) => contact.id == data.contactId
+      );
+      contact.conversation.forEach((message) => {
+        if (message.senderId == data.senderId) {
+          message.hasBeenRead = data.hasBeenRead;
+          message.hasBeenDelivered = data.hasBeenDelivered;
+        }
+      });
+    },
+    openDialogReadContactMessages(state, payload) {
+      const contact = state.currentUserContacts.find(
+        (contact) => contact.id == payload.contactId
+      );
+      contact.conversation.forEach((message) => {
+        if (message.senderId != state.currentUser.id && !message.hasBeenRead) {
+          message.hasBeenRead = true;
+          message.hasBeenDelivered = true;
+        }
+      });
+    },
+    addContactMessage(state, payload) {
+      const contact = state.currentUserContacts.find(
+        (contact) => contact.id == payload.conversationId
+      );
+      contact.conversation.push(payload);
+    },
     setUserDirectory(state, payload) {
       state.userDirectory = payload;
     },
@@ -72,6 +145,7 @@ export default new Vuex.Store({
     //     }
     //   });
     // },
+
     SOCKET_deleteContact(state, data) {
       // listing.listingImages.splice(
       //   listing.listingImages.findIndex((v) => v.listingOrder === index),
@@ -84,6 +158,7 @@ export default new Vuex.Store({
         ),
         1
       );
+
       // const removeIndex = state.currentUserContacts
       //   .map((contact) => {
       //     contact.id;
@@ -94,6 +169,7 @@ export default new Vuex.Store({
       // state.message = data;
       console.log(data);
     },
+
     SOCKET_newLogin(state, message) {
       console.log(state.currentUserContacts, message);
       if (state.currentUserContacts) {
@@ -113,6 +189,29 @@ export default new Vuex.Store({
         });
       }
     },
+    SOCKET_recievedListingInvite(state, data) {
+      console.log(data);
+      state.currentUser.recievedNotifications.push(data.data.notification);
+    },
+    SOCKET_recievedChatInvite(state, data) {
+      if (data.data.success) {
+        state.currentUserContacts.push(data.data.invite);
+        state.currentUser.recievedNotifications.push(data.data.notification);
+      }
+    },
+    SOCKET_pingMessage(state, data) {
+      console.log(data);
+      const contact = state.currentUserContacts.find(
+        (contact) => contact.id == data.conversationId
+      );
+      contact.conversation.push(data);
+    },
+    SOCKET_chatMessage(state, data) {
+      const contact = state.currentUserContacts.find(
+        (contact) => contact.id == data.conversationId
+      );
+      contact.conversation.push(data);
+    },
     SOCKET_userLogout(state, message) {
       // console.log(state.currentUserContacts, message);
       if (state.currentUserContacts) {
@@ -129,6 +228,9 @@ export default new Vuex.Store({
           }
         });
       }
+    },
+    addInviteToContacts(state, payload) {
+      state.currentUserContacts.push(payload.contact);
     },
 
     deleteInvite(state, payload) {
@@ -152,6 +254,12 @@ export default new Vuex.Store({
     setLoading(state, payload) {
       state.loading = payload.loading;
     },
+    setNotificationHasBeenRead(state, payload) {
+      const notifToUpdate = state.currentUser.recievedNotifications.find(
+        (notification) => notification.id == payload.notificationId
+      );
+      notifToUpdate.hasBeenRead = true;
+    },
     removeListingFromCurrentUserListings(state, payload) {
       state.currentUserListings.splice(
         state.currentUserListings.findIndex(
@@ -165,6 +273,21 @@ export default new Vuex.Store({
     },
     setCurrentUserContacts(state, payload) {
       state.currentUserContacts = payload;
+    },
+    updateContactInviteStatus(state, payload) {
+      state.currentUserContacts.forEach((contact) => {
+        if (contact.uuid == payload.invite.uuid) {
+          payload.invite.hasBeenAccepted
+            ? (contact.hasBeenAccepted = payload.invite.hasBeenAccepted)
+            : false;
+          payload.invite.hasBeenDelivered
+            ? (contact.hasBeenDelivered = payload.invite.hasBeenDelivered)
+            : false;
+          payload.invite.isBlocked
+            ? (contact.isBlocked = payload.invite.isBlocked)
+            : false;
+        }
+      });
     },
     updateCurrentUserContacts(state, payload) {
       state.currentUserContacts.forEach((contact) => {
@@ -198,6 +321,15 @@ export default new Vuex.Store({
     },
     logOutUser(state) {
       state.currentUser = null;
+    },
+    showNToast(state, payload) {
+      for (const key in payload) {
+        state.ntoast[key] = payload[key];
+      }
+      // state.toast.icon = state.toast.icons[payload.sclass];
+      state.ntoast.icon = state.ntoast.icons[payload.nclass];
+      state.ntoast.color = state.ntoast.colors[payload.nclass];
+      state.ntoast.show = true;
     },
     showToast(state, payload) {
       for (const key in payload) {
@@ -235,6 +367,24 @@ export default new Vuex.Store({
     SOCKET_NEWLOGIN({ commit }, payload) {
       console.log(payload, { commit });
     },
+    openDialogReadContactMessages({ commit }, payload) {
+      commit('openDialogReadContactMessages', payload);
+    },
+    async getSingleListingDetails({ state }, payload) {
+      const res = await fetch(
+        `${config.serverURL}/listings/listing/${payload.listinguuid}`,
+        {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+      const data = await res.json();
+      console.log({ data, res, state });
+      return data;
+    },
     async getAllUsers({ commit }) {
       const res = await fetch(`${config.serverURL}/users`);
       const data = await res.json();
@@ -254,7 +404,29 @@ export default new Vuex.Store({
       // console.log({ data, res, commit });
       return data.messages;
     },
-    async sendInviteResponse({ state }, payload) {
+    async setNotificationHasBeenRead({ commit, state }, payload) {
+      const updateData = [];
+      const updateObject = { name: 'hasBeenRead', value: payload.hasBeenRead };
+      updateData.push(updateObject);
+      const res = await fetch(
+        `${config.serverURL}/notifications/notification/${payload.notificationId}`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${state.currentUser.token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(updateData),
+        }
+      );
+      const data = await res.json();
+      console.log(data, commit);
+      if (data.success) {
+        commit('setNotificationHasBeenRead', payload);
+      }
+    },
+    async sendInviteResponse({ commit, state }, payload) {
       const { contactId, response } = payload;
       const updateData = [];
       let updateObject;
@@ -281,10 +453,67 @@ export default new Vuex.Store({
       });
       const data = await res.json();
       // console.log(data, res);
+      this._vm.$socket.emit('inviteResponse', {
+        data,
+        socketId: payload.chattee.currentSocketId,
+      });
+      commit('updateContactInviteStatus', data);
       return data;
     },
-    async sendChatMessage({ state }, payload) {
-      const { messageText, senderId, recieverId, conversationId } = payload;
+    async sendListingInviteToUser({ state }, payload) {
+      const res = await fetch(
+        `${config.serverURL}/notifications/users/${payload.invitee.id}`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${state.currentUser.token}`,
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(payload.inviteDetails),
+        }
+      );
+      const data = await res.json();
+      console.log(data, res);
+      this._vm.$socket.emit('sendListingInvite', {
+        data,
+        socketId: data.notification.reciever.currentSocketId,
+      });
+      return data;
+    },
+    async sendChatInviteToUser({ commit, state }, payload) {
+      console.log(payload);
+      console.log(commit, state);
+      const res = await fetch(
+        `${config.serverURL}/chat/invites/${payload.id}`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${state.currentUser.token}`,
+            'Accept': 'application/json',
+            'Content-type': 'application/json',
+          },
+        }
+      );
+      const data = await res.json();
+      console.log(data, res);
+      if (data.success) {
+        commit('addInviteToContacts', { contact: data.invite });
+        this._vm.$socket.emit('sendChatInvite', {
+          data,
+        });
+      }
+
+      return data;
+    },
+    async sendChatMessage({ commit, state }, payload) {
+      const {
+        messageText,
+        senderId,
+        recieverId,
+        conversationId,
+        chattee,
+      } = payload;
       console.log(payload);
       const res = await fetch(
         `${config.serverURL}/chat/contacts/${conversationId}/messages`,
@@ -305,7 +534,12 @@ export default new Vuex.Store({
       );
       const data = await res.json();
       console.log({ data, res });
-      return data.messageContent;
+      commit('addContactMessage', data.messageContent);
+      this._vm.$socket.emit('chatMessage', {
+        message: data.messageContent,
+        chattee,
+      });
+      // return data.messageContent;
     },
 
     async pingInvitee({ commit, state }, payload) {
@@ -386,7 +620,7 @@ export default new Vuex.Store({
     },
     async getCurrentUserListings({ commit, state }) {
       const res = await fetch(
-        `${config.serverURL}/user/${state.currentUser.username}/listings`,
+        `${config.serverURL}/user/${state.currentUser?.username}/listings`,
         {
           method: 'GET',
         }
@@ -533,6 +767,21 @@ export default new Vuex.Store({
         resolve();
       });
     },
+    showNToast(
+      { commit },
+      {
+        sender,
+        message,
+        nclass = 'like',
+        timeout = 2000,
+        imgUrl = 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
+      }
+    ) {
+      return new Promise((resolve) => {
+        commit('showNToast', { message, timeout, imgUrl, nclass, sender });
+        resolve();
+      });
+    },
     hideLoader({ commit }) {
       commit('hideLoader');
     },
@@ -580,8 +829,17 @@ export default new Vuex.Store({
     currentUserContacts(state) {
       return state.currentUserContacts;
     },
+    getContactConversationById: (state) => (id) => {
+      const contact = state.currentUserContacts.find(
+        (contact) => contact.id == id
+      );
+      return contact.conversation;
+    },
     toast(state) {
       return state.toast;
+    },
+    ntoast(state) {
+      return state.ntoast;
     },
     loader(state) {
       return state.loader;
@@ -594,6 +852,28 @@ export default new Vuex.Store({
     },
     loggedInUser(state) {
       return state.currentUser;
+    },
+    unreadMessageCount(state) {
+      if (state.currentUserContacts.length > 0) {
+        const messageCount = state.currentUserContacts.map((contact) => {
+          return contact.conversation.filter((message) => {
+            return (
+              !message.hasBeenRead && message.senderId != state.currentUser.id
+            );
+          });
+        });
+        console.log(messageCount);
+        return messageCount[0].length;
+      } else {
+        return 0;
+      }
+    },
+    recievedNotifications(state) {
+      if (state.currentUser) {
+        return state.currentUser.recievedNotifications;
+      } else {
+        return [];
+      }
     },
     listingInCreation(state) {
       return state.listingInCreation;

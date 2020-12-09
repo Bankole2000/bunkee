@@ -1,6 +1,12 @@
 <template>
   <div class="chat-modal" style="max-width: 500px;">
-    <v-badge bordered overlap dot offset-x="20" offset-y="20">
+    <v-badge
+      overlap
+      :value="unreadMessageCount"
+      :content="unreadMessageCount"
+      offset-x="25"
+      offset-y="25"
+    >
       <v-btn icon @click="dialog = true">
         <v-icon>mdi-chat</v-icon>
       </v-btn>
@@ -98,7 +104,7 @@
                   v-for="contact in invites"
                   :key="contact.id"
                 >
-                  <ChatModal :contact="contact" :key="contactModalKey" />
+                  <ChatModal :contact="contact" :key="componentKey" />
                 </v-list>
                 <v-list subheader class="mb-0 pb-0">
                   <v-divider></v-divider>
@@ -114,7 +120,7 @@
                   v-for="contact in contacts"
                   :key="contact.id"
                 >
-                  <ChatModal :contact="contact" :key="contactModalKey" />
+                  <ChatModal :contact="contact" :key="componentKey" />
                 </v-list>
                 <v-list class="py-0" subheader>
                   <v-divider></v-divider>
@@ -131,7 +137,7 @@
                   v-for="contact in blocked"
                   :key="contact.id"
                 >
-                  <ChatModal :contact="contact" :key="contactModalKey" />
+                  <ChatModal :contact="contact" :key="componentKey" />
                 </v-list>
               </div>
               <div v-else>You are not logged in</div>
@@ -226,9 +232,12 @@
               </v-card>
               <v-divider></v-divider>
               <v-list>
-                <v-list-item v-for="(user, i) in allUsersDirectory" :key="i">
-                  <v-list-item-avatar color="grey">
-                    <!-- TODO: get default not logged in user image -->
+                <UserContextModal
+                  v-for="(user, i) in allUsersDirectory"
+                  :key="i"
+                  :user="user"
+                />
+                <!-- <v-list-item-avatar color="grey">
                     <v-img :src="user.profileImageUrl"></v-img>
                   </v-list-item-avatar>
                   <v-list-item-content>
@@ -238,11 +247,7 @@
                     <v-list-item-subtitle
                       >Login to Join the chat</v-list-item-subtitle
                     >
-                  </v-list-item-content>
-                  <v-list-item-action>
-                    <v-btn icon><v-icon>mdi-close</v-icon></v-btn>
-                  </v-list-item-action>
-                </v-list-item>
+                  </v-list-item-content> -->
               </v-list>
               <v-divider></v-divider>
             </v-window-item>
@@ -288,10 +293,12 @@
 
 <script>
 import ChatModal from '../modals/ChatModal';
+import UserContextModal from './UserContextModal';
 import { mapGetters, mapActions } from 'vuex';
 export default {
   components: {
     ChatModal,
+    UserContextModal,
   },
 
   data() {
@@ -299,7 +306,7 @@ export default {
       selected: [2],
       step: 0,
       users: [],
-      contactModalKey: 0,
+      componentKey: 0,
       dialog: false,
       notifications: false,
       sound: true,
@@ -425,7 +432,7 @@ export default {
   methods: {
     ...mapActions(['updateUserContacts', 'getAllUsers']),
     forceRerender() {
-      this.contactModalKey += 1;
+      this.componentKey += 1;
     },
   },
   sockets: {
@@ -465,7 +472,12 @@ export default {
     // },
   },
   computed: {
-    ...mapGetters(['loggedInUser', 'currentUserContacts', 'userDirectory']),
+    ...mapGetters([
+      'loggedInUser',
+      'currentUserContacts',
+      'userDirectory',
+      'unreadMessageCount',
+    ]),
     invites() {
       if (this.loggedInUser) {
         return this.currentUserContacts.filter(
@@ -478,6 +490,17 @@ export default {
         return [];
       }
     },
+    // unreadMessageCount() {
+    //   if (this.loggedInUser) {
+    //     return this.currentUserContacts.map((contact) => {
+    //       return contact.conversation.map((message) => {
+    //         return message.recieverId == this.loggedInUser.id;
+    //       });
+    //     }).length;
+    //   } else {
+    //     return 0;
+    //   }
+    // },
     contacts() {
       if (this.loggedInUser) {
         return this.currentUserContacts.filter(

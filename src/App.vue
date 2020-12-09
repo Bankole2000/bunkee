@@ -9,6 +9,7 @@
     </v-main>
     <BottomNav v-if="$vuetify.breakpoint.smAndDown" />
     <Snackbar />
+    <NotifSnackbar />
     <Loader />
   </v-app>
 </template>
@@ -16,6 +17,7 @@
 <script>
 import { mapActions } from 'vuex';
 import Snackbar from './components/shared/Snackbar';
+import NotifSnackbar from './components/shared/LargeSnackbar';
 import Loader from './components/shared/Loader';
 import Navbar from './components/shared/Navbar';
 import BottomNav from './components/shared/BottomNav';
@@ -27,6 +29,7 @@ export default {
     Snackbar,
     Loader,
     Navbar,
+    NotifSnackbar,
     MobilePageTitle,
     BottomNav,
   },

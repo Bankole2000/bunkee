@@ -37,10 +37,12 @@
       >
 
       <v-spacer v-if="$vuetify.breakpoint.mdAndUp"></v-spacer>
+      <Notifications />
       <OldChatModal />
       <v-btn text class="text-capitalize" v-if="$vuetify.breakpoint.mdAndUp"
         >Become A Host</v-btn
       >
+
       <ContactModal />
       <v-btn
         v-if="$route.path != '/login' && $route.path != '/signup'"
@@ -209,12 +211,14 @@ import LoginModal from '../modals/LoginModal';
 import SignupModal from '../modals/SignupModal';
 import OldChatModal from '../modals/MobileChatModal';
 import ContactModal from '../modals/ContactsModal';
+import Notifications from '../modals/Notifications';
 export default {
   components: {
     LoginModal,
     SignupModal,
     OldChatModal,
     ContactModal,
+    Notifications,
   },
   data() {
     return {

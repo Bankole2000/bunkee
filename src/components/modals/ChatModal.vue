@@ -62,14 +62,15 @@
       <v-list-item-action>
         <!-- TODO: change time ago minutes to m, days to d, seconds to s etc -->
         <!-- TODO: render conditionals -->
-        <v-list-item-action-text
-          >{{
+        <v-list-item-action-text>
+          {{
             new Date(lastMessage.createdAt).toLocaleString(['en-US'], {
               hour: '2-digit',
               minute: '2-digit',
               hour12: false,
             })
-          }}<v-btn
+          }}
+          <v-btn
             small
             fab
             v-if="
@@ -96,9 +97,10 @@
         <v-chip
           class="mb-0 ml-0"
           small
+          v-if="contact.hasBeenAccepted"
           color="primary"
           :style="[
-            messages.filter(
+            conversation.filter(
               (message) =>
                 message.recieverId == loggedInUser.id && !message.hasBeenRead
             ).length > 0
@@ -107,7 +109,7 @@
           ]"
         >
           {{
-            messages.filter(
+            conversation.filter(
               (message) =>
                 message.recieverId == loggedInUser.id && !message.hasBeenRead
             ).length
@@ -154,7 +156,9 @@
                 ></v-list-item-subtitle
               >
             </v-list-item-content>
-            <v-list-item-action>
+            <ChatContextModal :contact="contact" :user="chattee" />
+
+            <v-list-item-action class="d-flex">
               <v-btn icon @click="dialog = false"
                 ><v-icon>mdi-close</v-icon></v-btn
               >
@@ -205,13 +209,13 @@
           </div>
 
           <v-slide-y-reverse-transition group>
-            <div v-for="(message, i) in chatMessages" :key="i">
+            <div v-for="(message, i) in conversation" :key="i">
               <!-- v-if="groupByDate(message.createdAt)" -->
               <div
                 v-if="
                   i != 0 &&
                     new Date(message.createdAt).getDate() !=
-                      new Date(chatMessages[i - 1 || 0].createdAt).getDate()
+                      new Date(conversation[i - 1 || 0].createdAt).getDate()
                 "
                 style="max-width:150px;"
                 class="px-4 py-2 my-2 text-center blue lighten-4 rounded-lg mx-auto subtitle-2 text-uppercase"
@@ -289,6 +293,34 @@
               </div>
             </div>
           </v-slide-y-reverse-transition>
+          <div
+            style="width: 100%;"
+            class="px-4 pt-2 pb-0 my-2 text-center blue lighten-4 rounded-lg mx-auto subtitle-2"
+          >
+            <p class="mb-0 mt-2 subtitle-1">
+              You have been blocked by this user
+            </p>
+            <v-row class="d-flex pa-4 align-center justify-space-around">
+              <v-btn
+                @click="cancelInvite(contact.id)"
+                :disabled="buttonsBusy"
+                color="error"
+                text
+                class="text-capitalize"
+              >
+                <v-icon left>mdi-cancel</v-icon>
+                Delete Contact
+              </v-btn>
+              <v-btn
+                @click="pingContact(contact.id, chattee.id)"
+                :disabled="buttonsBusy"
+                color="info"
+                text
+                class="text-capitalize"
+                ><v-icon left>mdi-bell-ring</v-icon>Ping</v-btn
+              >
+            </v-row>
+          </div>
           <div
             v-if="
               !contact.hasBeenAccepted &&
@@ -401,6 +433,7 @@
             <v-text-field
               @keypress.enter="sendMessage"
               solo
+              :disabled="!contact.hasBeenAccepted || contact.isBlocked"
               hint="Type a message"
               persistent-hint
               rounded
@@ -410,23 +443,40 @@
               prepend-icon="mdi-camera-plus"
               append-icon="mdi-send"
               single-line
-              placeholder="Type a message. Hit 'Enter' to send"
+              :placeholder="
+                contact.hasBeenAccepted
+                  ? `Type a message. Hit 'Enter' to send`
+                  : `This invite hasn't been accepted yet`
+              "
               v-model="chatMessageText"
             ></v-text-field>
           </v-col>
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <audio
+      ref="newMessageInChat"
+      :src="require(`@/assets/audio/newMessageInChat.mp3`)"
+    ></audio>
+    <audio
+      ref="newMessageChatClosed"
+      :src="require('@/assets/audio/newMessageChatClosed.mp3')"
+    ></audio>
+    <audio ref="error" :src="require('@/assets/audio/error.mp3')"></audio>
+    <!-- <audio ref="success" src="success.mp3"></audio>
+    <audio ref="error" src="error.mp3"></audio> -->
   </div>
 </template>
 
 <script>
 import ProfileModal from './ProfileModal';
-import { mapGetters, mapActions } from 'vuex';
+import ChatContextModal from './ChatContextModal';
+import { mapGetters, mapActions, mapMutations } from 'vuex';
 export default {
   props: ['contact'],
   components: {
     ProfileModal,
+    ChatContextModal,
   },
   sockets: {
     isTyping: function(data) {
@@ -439,9 +489,12 @@ export default {
       }
     },
     chatMessage: function(data) {
-      this.messages.push(data);
+      // this.messages.push(data);
       this.isTyping = false;
       if (this.dialog) {
+        this.$refs.newMessageInChat.volume = 0.3;
+        this.$refs.newMessageInChat.play();
+
         this.$socket.emit('allRead', {
           contactId: this.contact.id,
           senderId: data.senderId,
@@ -456,12 +509,17 @@ export default {
             left: 0,
             behaviour: 'smooth',
           });
+          this.openDialogReadContactMessages({ contactId: this.contact.id });
         }, 200);
+      } else {
+        this.$refs.newMessageChatClosed.volume = 0.3;
+        this.$refs.newMessageChatClosed.play();
       }
     },
     pingMessage: function(data) {
-      this.messages.push(data);
       if (this.dialog) {
+        this.$refs.newMessageInChat.volume = 0.3;
+        this.$refs.newMessageInChat.play();
         setTimeout(() => {
           console.log(this.$refs);
           this.$refs.chatWindow.scrollBy({
@@ -470,6 +528,9 @@ export default {
             behaviour: 'smooth',
           });
         }, 200);
+      } else {
+        this.$refs.newMessageChatClosed.volume = 0.3;
+        this.$refs.newMessageChatClosed.play();
       }
       this.$socket.emit('allRead', {
         contactId: this.contact.id,
@@ -480,6 +541,7 @@ export default {
       });
     },
     allRead: function(data) {
+      console.log(data);
       this.messages.forEach((message) => {
         if (!message.hasBeenDelivered || !message.hasBeenRead) {
           // if (message.senderId != this.loggedInUser.id) {
@@ -515,7 +577,10 @@ export default {
   },
   watch: {
     dialog: function(newValue /*, oldValue*/) {
+      console.log(this.unreadMessageCount);
+      console.log({ isInvitee: this.isInvitee, isInviter: this.isInviter });
       if (newValue) {
+        this.openDialogReadContactMessages({ contactId: this.contact.id });
         this.$socket.emit('allRead', {
           contactId: this.contact.id,
           senderId: this.chattee.id,
@@ -568,7 +633,9 @@ export default {
       'getContactMessages',
       'sendChatMessage',
       'sendInviteResponse',
+      'openDialogReadContactMessages',
     ]),
+    ...mapMutations(['addContactMessage']),
     groupByDate(date) {
       var old_date = this.temp.old_unique_date;
       var new_date = new Date(date).getDate();
@@ -615,7 +682,7 @@ export default {
       this.pingInvitee({ contactId: id, inviteeId }).then((data) => {
         this.$socket.emit('pingMessage', { chattee: this.chattee, data });
         console.log(data);
-        this.messages.push(data.pingMessage);
+        this.addContactMessage(data.pingMessage);
         setTimeout(() => {
           console.log(this.$refs);
           this.$refs.chatWindow.scrollBy({
@@ -632,7 +699,11 @@ export default {
       this.buttonsBusy = true;
       response ? (this.isLoadingAccept = true) : (this.isLoadingCancel = true);
       console.log(id, response);
-      this.sendInviteResponse({ contactId: id, response }).then((data) => {
+      this.sendInviteResponse({
+        contactId: id,
+        response,
+        chattee: this.chattee,
+      }).then((data) => {
         console.log(data);
       });
 
@@ -648,15 +719,27 @@ export default {
     },
     sendMessage() {
       const message = {};
+      if (!/([^\s])/.test(this.chatMessageText)) {
+        this.$refs.error.volume = 0.3;
+        this.$refs.error.play();
+        this.showToast({
+          sclass: 'error',
+          message: 'Message Cannot be empty',
+          timeout: 1500,
+        });
+        return false;
+      }
       message.messageText = this.chatMessageText;
       this.sendChatMessage({
         messageText: message.messageText,
         senderId: this.loggedInUser.id,
         recieverId: this.chattee.id,
         conversationId: this.contact.id,
-      }).then((message) => {
+        chattee: this.chattee,
+      }).then(() => {
         this.chatMessageText = '';
-        this.messages.push(message);
+
+        // this.messages.push(message);
         setTimeout(() => {
           // console.log(this.$refs);
           this.$refs.chatWindow.scrollBy({
@@ -665,7 +748,7 @@ export default {
             behaviour: 'smooth',
           });
         }, 200);
-        this.$socket.emit('chatMessage', { message, chattee: this.chattee });
+        // this.$socket.emit('chatMessage', { message, chattee: this.chattee });
       });
     },
     sendImageWithMessage() {
@@ -673,24 +756,52 @@ export default {
     },
   },
   computed: {
-    ...mapGetters(['loggedInUser']),
+    ...mapGetters([
+      'loggedInUser',
+      'getContactConversationById',
+      'unreadMessageCount',
+    ]),
     chattee() {
-      if (this.contact.inviterId == this.loggedInUser.id) {
-        return this.contact.invitee;
+      if (this.loggedInUser) {
+        if (this.contact.inviterId == this.loggedInUser.id) {
+          return this.contact.invitee;
+        } else {
+          return this.contact.inviter;
+        }
       } else {
-        return this.contact.inviter;
+        return null;
       }
     },
     chatter() {
-      if (this.contact.inviterId == this.loggedInUser.id) {
-        return this.contact.inviter;
+      if (this.loggedInUser) {
+        if (this.contact.inviterId == this.loggedInUser.id) {
+          return this.contact.inviter;
+        } else {
+          return this.contact.invitee;
+        }
       } else {
-        return this.contact.invitee;
+        return null;
       }
     },
     lastMessage() {
-      if (this.messages.length > 0) {
-        return this.messages[this.messages.length - 1];
+      if (this.conversation.length > 0) {
+        return this.conversation[this.conversation.length - 1];
+      } else if (
+        !this.contact.hasBeenAccepted &&
+        !this.contact.hasBeenDeclined &&
+        !this.contact.isBlocked
+      ) {
+        return {
+          createdAt: this.contact.createdAt,
+          messageText: this.isInviter
+            ? `You invited <span class="primary--text">@${this.contact.invitee.username}</span> To Chat`
+            : `<span class="primary--text">@${this.contact.inviter.username}</span> invited you to chat`,
+        };
+      } else if (this.contact.hasBeenAccepted) {
+        return {
+          createdAt: this.contact.createdAt,
+          messageText: `<span class="primary--text">@${this.contact.invitee.username}</span> is now a contact`,
+        };
       } else {
         return {};
       }
@@ -698,8 +809,18 @@ export default {
     chatMessages() {
       return this.messages;
     },
+    conversation() {
+      if (this.loggedInUser) {
+        console.log(this.getContactConversationById(this.contact.id));
+        return this.getContactConversationById(this.contact.id);
+      } else {
+        return [];
+      }
+    },
   },
-  beforeMount() {},
+  beforeMount() {
+    console.log(this.getContactConversationById(this.contact.id));
+  },
   mounted() {
     // this.getContactMessages({ contactId: this.contact.id }).then((data) => {
     //   this.messages = data;

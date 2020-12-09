@@ -1,18 +1,18 @@
 <template>
   <v-app-bar
     app
+    v-if="listing"
     color="#6A76AB"
     dark
     shrink-on-scroll
     prominent
-    src="https://picsum.photos/1920/1080?random"
+    :src="listing.listingImages[0].imageResizedUrl"
     fade-img-on-scroll
-    v-if="!['/login', '/signup'].includes($route.path) && !showPage"
   >
     <template v-slot:img="{ props }">
       <v-img
         v-bind="props"
-        gradient="to top right, rgba(100,115,201,.7), rgba(25,32,72,.7)"
+        gradient="to top right, rgba(10,15,20,.9), rgba(25,32,72,.7)"
       ></v-img>
     </template>
     <!-- <v-btn
@@ -27,7 +27,9 @@
     </v-btn> -->
     <v-app-bar-nav-icon></v-app-bar-nav-icon>
 
-    <v-toolbar-title class="pl-0">{{ $route.name }}</v-toolbar-title>
+    <v-toolbar-title v-if="listing" class="pl-0">{{
+      listing.title
+    }}</v-toolbar-title>
 
     <v-spacer></v-spacer>
 
@@ -41,7 +43,7 @@
 
     <MenuModal />
 
-    <template v-slot:extension>
+    <!-- <template v-slot:extension>
       <v-text-field
         align-with-title
         light
@@ -52,7 +54,7 @@
         class="rounded-xl mt-4"
       >
       </v-text-field>
-    </template>
+    </template> -->
     <audio
       ref="newNotification"
       :src="require('@/assets/audio/newNotification.mp3')"
@@ -65,7 +67,9 @@ import MenuModal from '../modals/MenuModal';
 import ChatModal from '../modals/ContactsModal';
 import Notifications from '../modals/Notifications';
 import { mapActions } from 'vuex';
+
 export default {
+  props: ['listing'],
   sockets: {
     recievedListingInvite: function(data) {
       this.componentKey += 1;
@@ -112,27 +116,10 @@ export default {
   },
   data() {
     return {
-      dialog: false,
-      pageRegex: '',
-      pages: [
-        {
-          title: '',
-          route: '',
-        },
-      ],
       componentKey: 0,
     };
   },
-  computed: {
-    // ...mapGetters(['loggedInUser']),
-    showPage() {
-      return this.$route.name == 'Verify' ||
-        this.$route.name == 'Profile' ||
-        this.$route.name == 'Listing Details'
-        ? true
-        : false;
-    },
-  },
+  computed: {},
   methods: {
     ...mapActions(['showNToast']),
   },

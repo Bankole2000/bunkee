@@ -26,7 +26,8 @@
               </v-badge>
               <p>Messages</p>
             </v-col>
-            <v-col cols="6" @click="goTo('/user/notifications')">
+            <!-- @click="goTo('/user/notifications')" -->
+            <v-col cols="6" @click="showLargeSnackbar()">
               <v-badge bordered overlap content="6">
                 <v-avatar size="50" tile>
                   <v-img :src="require('@/assets/icons/bell.svg')"></v-img>
@@ -179,7 +180,11 @@ export default {
     ...mapGetters(['loggedInUser']),
   },
   methods: {
-    ...mapActions(['logOut', 'showToast']),
+    showLargeSnackbar() {
+      console.log('show Large Snackbar');
+      this.showNToast({ message: 'testing testing', timeout: 2000 });
+    },
+    ...mapActions(['logOut', 'showToast', 'showNToast']),
     goTo(path) {
       this.$router.push(path);
       this.dialog = false;
