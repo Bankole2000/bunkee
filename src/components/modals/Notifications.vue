@@ -252,6 +252,9 @@ export default {
           this.$emit('readNotification');
         });
       }
+      if (notification.notificationType == 'listingInvite') {
+        this.$router.push(notification.notificationUrl);
+      }
       // console.log(notification);
     },
     camelToTitle(camelCase) {

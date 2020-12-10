@@ -67,7 +67,11 @@
               Listing to Invite to
               <!-- Listing to Invite to -->
               <v-item-group v-model="selectedListingSendInvite">
-                <v-col v-for="(item, i) in items" :key="i" cols="12">
+                <v-col
+                  v-for="(listing, i) in currentUserListings"
+                  :key="i"
+                  cols="12"
+                >
                   <v-container class="py-0">
                     <v-item v-slot:default="{ active, toggle }">
                       <!-- :color="item.color" -->
@@ -87,10 +91,13 @@
                           hide-delimiter-background
                           height="auto"
                         >
-                          <v-carousel-item v-for="n in 5" :key="n">
+                          <v-carousel-item
+                            v-for="(image, n) in listing.listingImages"
+                            :key="n"
+                          >
                             <v-img
                               @click.stop="toggle"
-                              :src="item.src"
+                              :src="image.imageResizedUrl"
                               :aspect-ratio="510 / 300"
                             ></v-img>
                           </v-carousel-item>
@@ -101,10 +108,13 @@
                           >
                             <div>
                               <v-card-subtitle class="py-0 px-0"
-                                >{Listing Title} - e.g. My little getaway
-                                &middot; State</v-card-subtitle
+                                >{{ listing.title }} &middot;
+                                {{
+                                  listing.locationState.replace('State', '')
+                                }}</v-card-subtitle
                               >
-                              2 Bedroom Flat &middot; City
+                              {{ listing.buildingType }} &middot;
+                              {{ listing.locationCity }}
                             </div>
                             <v-spacer> </v-spacer>
                             <v-btn @click.stop="() => {}" icon
@@ -127,7 +137,9 @@
                         <v-overlay absolute :value="active">
                           <v-btn
                             color="success"
-                            @click.stop="sendListingInvite(userToInvite, item)"
+                            @click.stop="
+                              sendListingInvite(userToInvite, listing)
+                            "
                           >
                             Send Invite
                           </v-btn>
@@ -340,7 +352,7 @@ export default {
 
           notificationText: `invited you to view a listing`,
           notificationAction: 'goToListing',
-          notificationUrl: 'listing/listingId',
+          notificationUrl: `/listing/${listing.uuid}`,
         },
       }).then((data) => {
         console.log(data);

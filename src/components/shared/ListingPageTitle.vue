@@ -74,8 +74,10 @@ export default {
     recievedListingInvite: function(data) {
       this.componentKey += 1;
       console.log(data);
-      this.$refs.newNotification.volume = 0.3;
-      this.$refs.newNotification.play();
+      if (this.$refs.newNotification) {
+        this.$refs.newNotification.volume = 0.3;
+        this.$refs.newNotification.play();
+      }
       this.showNToast({
         nclass: `${data.data.notification.notificationType}`,
         message: data.data.notification.notificationText,

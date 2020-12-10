@@ -68,16 +68,20 @@ import { mapActions } from 'vuex';
 export default {
   sockets: {
     recievedListingInvite: function(data) {
-      this.componentKey += 1;
-      console.log(data);
-      this.$refs.newNotification.volume = 0.3;
-      this.$refs.newNotification.play();
-      this.showNToast({
-        nclass: `${data.data.notification.notificationType}`,
-        message: data.data.notification.notificationText,
-        sender: data.data.notification.sender.username,
-        imgUrl: data.data.notification.sender.profileImageUrl,
-      });
+      if (this.isMounted) {
+        this.componentKey += 1;
+        console.log(data);
+        if (this.$refs.newNotification) {
+          this.$refs.newNotification.volume = 0.3;
+          this.$refs.newNotification.play();
+        }
+        this.showNToast({
+          nclass: `${data.data.notification.notificationType}`,
+          message: data.data.notification.notificationText,
+          sender: data.data.notification.sender.username,
+          imgUrl: data.data.notification.sender.profileImageUrl,
+        });
+      }
     },
     recievedChatInvite: function(data) {
       this.componentKey += 1;
@@ -112,6 +116,7 @@ export default {
   },
   data() {
     return {
+      isMounted: false,
       dialog: false,
       pageRegex: '',
       pages: [
@@ -135,6 +140,12 @@ export default {
   },
   methods: {
     ...mapActions(['showNToast']),
+  },
+  mounted() {
+    this.isMounted = true;
+  },
+  beforeDestroy() {
+    this.isMounted = false;
   },
 };
 </script>

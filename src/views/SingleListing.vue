@@ -62,7 +62,7 @@
           <p
             v-if="bookingDates.length >= 2"
             style="font-size: 22px;"
-            class="mb-0 font-weight-medium"
+            class="mb-0 font-weight-medium text-capitalize"
           >
             {{ bookingDates[0] | moment('from', `${bookingDates[1]}`, true) }}
             in {{ listingDetails.locationCity }}

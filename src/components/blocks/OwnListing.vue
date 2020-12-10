@@ -175,11 +175,11 @@
           >
             <template v-slot:activator="{ on }">
               <v-list-item-avatar class="mx-2" size="48" v-on="on" color="grey">
-                <v-img :src="listing.user.profileImageUrl"></v-img
+                <v-img :src="listing.owner.profileImageUrl"></v-img
               ></v-list-item-avatar>
               <v-list-item-content v-on="on">
                 <v-list-item-title class="font-weight-medium"
-                  >@{{ listing.user.username }}</v-list-item-title
+                  >@{{ listing.owner.username }}</v-list-item-title
                 >
                 <v-list-item-subtitle>
                   {{
@@ -197,14 +197,14 @@
               <v-list dark>
                 <v-list-item>
                   <v-list-item-avatar size="48">
-                    <v-img :src="listing.user.profileImageUrl"></v-img>
+                    <v-img :src="listing.owner.profileImageUrl"></v-img>
                   </v-list-item-avatar>
                   <v-list-item-content>
                     <v-list-item-title>{{
-                      listing.user.firstname
+                      listing.owner.firstname
                     }}</v-list-item-title>
                     <v-list-item-subtitle
-                      >@{{ listing.user.username }}</v-list-item-subtitle
+                      >@{{ listing.owner.username }}</v-list-item-subtitle
                     >
                   </v-list-item-content>
                   <v-list-item-action>
@@ -223,7 +223,7 @@
                   <v-list-item-subtitle>
                     Joined
                     {{
-                      new Date(listing.user.createdAt).toLocaleString(
+                      new Date(listing.owner.createdAt).toLocaleString(
                         ['en-US'],
                         {
                           weekday: 'short',
