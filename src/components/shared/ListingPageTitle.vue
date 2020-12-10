@@ -72,42 +72,48 @@ export default {
   props: ['listing'],
   sockets: {
     recievedListingInvite: function(data) {
-      this.componentKey += 1;
-      console.log(data);
-      if (this.$refs.newNotification) {
-        this.$refs.newNotification.volume = 0.3;
-        this.$refs.newNotification.play();
+      if (this.isMounted) {
+        this.componentKey += 1;
+        console.log(data);
+        if (this.$refs.newNotification) {
+          this.$refs.newNotification.volume = 0.3;
+          this.$refs.newNotification.play();
+        }
+        this.showNToast({
+          nclass: `${data.data.notification.notificationType}`,
+          message: data.data.notification.notificationText,
+          sender: data.data.notification.sender.username,
+          imgUrl: data.data.notification.sender.profileImageUrl,
+        });
       }
-      this.showNToast({
-        nclass: `${data.data.notification.notificationType}`,
-        message: data.data.notification.notificationText,
-        sender: data.data.notification.sender.username,
-        imgUrl: data.data.notification.sender.profileImageUrl,
-      });
     },
     recievedChatInvite: function(data) {
-      this.componentKey += 1;
-      console.log(data);
-      this.$refs.newNotification.volume = 0.3;
-      this.$refs.newNotification.play();
-      this.showNToast({
-        nclass: `${data.data.notification.notificationType}`,
-        message: data.data.notification.notificationText,
-        sender: data.data.notification.sender.username,
-        imgUrl: data.data.notification.sender.profileImageUrl,
-      });
+      if (this.isMounted) {
+        this.componentKey += 1;
+        console.log(data);
+        this.$refs.newNotification.volume = 0.3;
+        this.$refs.newNotification.play();
+        this.showNToast({
+          nclass: `${data.data.notification.notificationType}`,
+          message: data.data.notification.notificationText,
+          sender: data.data.notification.sender.username,
+          imgUrl: data.data.notification.sender.profileImageUrl,
+        });
+      }
     },
     inviteResponse: function(data) {
-      console.log(data);
-      this.componentKey += 1;
-      this.$refs.newNotification.volume = 0.3;
-      this.$refs.newNotification.play();
-      this.showNToast({
-        nclass: `${data.data.notification.notificationType}`,
-        message: data.data.notification.notificationText,
-        sender: data.data.notification.sender.username,
-        imgUrl: data.data.notification.sender.profileImageUrl,
-      });
+      if (this.isMounted) {
+        console.log(data);
+        this.componentKey += 1;
+        this.$refs.newNotification.volume = 0.3;
+        this.$refs.newNotification.play();
+        this.showNToast({
+          nclass: `${data.data.notification.notificationType}`,
+          message: data.data.notification.notificationText,
+          sender: data.data.notification.sender.username,
+          imgUrl: data.data.notification.sender.profileImageUrl,
+        });
+      }
       // this.showNToast({ntclass: "chat", message: 'Sent you a Chat invite', })
     },
   },
@@ -118,12 +124,19 @@ export default {
   },
   data() {
     return {
+      isMounted: false,
       componentKey: 0,
     };
   },
   computed: {},
   methods: {
     ...mapActions(['showNToast']),
+  },
+  beforeDestroy() {
+    this.isMounted = false;
+  },
+  mounted() {
+    this.isMounted = true;
   },
 };
 </script>

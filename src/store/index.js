@@ -862,8 +862,8 @@ export default new Vuex.Store({
             );
           });
         });
-        console.log(messageCount);
-        return messageCount[0].length;
+        console.log(messageCount.flat());
+        return messageCount.flat().length;
       } else {
         return 0;
       }
