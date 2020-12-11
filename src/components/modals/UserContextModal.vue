@@ -15,6 +15,17 @@
         <v-list-item-content v-on="on">
           <v-list-item-title class="font-weight-medium"
             >@{{ user.username }}
+            <span
+              :class="
+                user.isOnline ? 'primary--text' : 'grey--text text--lighten-1'
+              "
+              class="caption"
+            >
+              &middot; {{ user.isOnline ? 'Online' : `Last Seen ` }}
+              <span v-if="!user.isOnline">{{
+                user.lastSeen | moment('from')
+              }}</span></span
+            >
           </v-list-item-title>
           <v-list-item-subtitle
             >Some details could be here or whatever, lol

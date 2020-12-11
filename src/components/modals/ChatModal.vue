@@ -481,7 +481,11 @@ export default {
   sockets: {
     isTyping: function(data) {
       console.log(data);
-      data.isTyping == true ? (this.isTyping = true) : (this.isTyping = false);
+      if (data.contactId == this.contact.id) {
+        data.isTyping == true
+          ? (this.isTyping = true)
+          : (this.isTyping = false);
+      }
     },
     userLogout: function(data) {
       if (data.id == this.chattee.id) {
@@ -489,11 +493,14 @@ export default {
       }
     },
     chatMessage: function(data) {
+      console.log(data);
       // this.messages.push(data);
       this.isTyping = false;
       if (this.dialog) {
-        this.$refs.newMessageInChat.volume = 0.3;
-        this.$refs.newMessageInChat.play();
+        if (data.conversationId == this.contact.id) {
+          this.$refs.newMessageInChat.volume = 0.3;
+          this.$refs.newMessageInChat.play();
+        }
 
         this.$socket.emit('allRead', {
           contactId: this.contact.id,
@@ -512,14 +519,19 @@ export default {
           this.openDialogReadContactMessages({ contactId: this.contact.id });
         }, 200);
       } else {
-        this.$refs.newMessageChatClosed.volume = 0.3;
-        this.$refs.newMessageChatClosed.play();
+        if (data.conversationId == this.contact.id) {
+          this.$refs.newMessageChatClosed.volume = 0.3;
+          this.$refs.newMessageChatClosed.play();
+        }
       }
     },
     pingMessage: function(data) {
+      console.log(data);
       if (this.dialog) {
-        this.$refs.newMessageInChat.volume = 0.3;
-        this.$refs.newMessageInChat.play();
+        if (data.conversationId == this.contact.id) {
+          this.$refs.newMessageInChat.volume = 0.3;
+          this.$refs.newMessageInChat.play();
+        }
         setTimeout(() => {
           console.log(this.$refs);
           this.$refs.chatWindow.scrollBy({
@@ -529,8 +541,10 @@ export default {
           });
         }, 200);
       } else {
-        this.$refs.newMessageChatClosed.volume = 0.3;
-        this.$refs.newMessageChatClosed.play();
+        if (data.conversationId == this.contact.id) {
+          this.$refs.newMessageChatClosed.volume = 0.3;
+          this.$refs.newMessageChatClosed.play();
+        }
       }
       this.$socket.emit('allRead', {
         contactId: this.contact.id,
@@ -608,12 +622,14 @@ export default {
       if (newValue.length > 0 && oldValue.length == 0) {
         this.$socket.emit('typing', {
           socketId: this.chattee.currentSocketId,
+          contactId: this.contact.id,
           isTyping: true,
         });
       }
       if (newValue.length == 0) {
         this.$socket.emit('typing', {
           socketId: this.chattee.currentSocketId,
+          contactId: this.contact.id,
           isTyping: false,
         });
       }
@@ -652,6 +668,7 @@ export default {
         isTyping: status,
       });
     },
+
     cancelInvite(id) {
       this.buttonsBusy = true;
       this.isLoadingCancel = true;

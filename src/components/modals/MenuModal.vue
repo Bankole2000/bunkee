@@ -190,12 +190,21 @@ export default {
       this.dialog = false;
     },
     logout() {
-      this.$socket.emit('logout', this.loggedInUser);
-      this.logOut();
-      this.showToast({
-        sclass: 'info',
-        message: 'Logged Out',
-      });
+      if (this.loggedInUser) {
+        this.$socket.emit('logout', this.loggedInUser);
+
+        this.logOut();
+        this.showToast({
+          sclass: 'info',
+          message: 'Logged Out',
+        });
+      } else {
+        this.showToast({
+          sclass: 'error',
+          message: 'Already Logged out',
+          timeout: 1500,
+        });
+      }
     },
   },
 };

@@ -1,7 +1,7 @@
 <template>
   <v-app-bar
     app
-    v-if="listing"
+    v-if="listing && $vuetify.breakpoint.smAndDown"
     color="#6A76AB"
     dark
     shrink-on-scroll
@@ -38,8 +38,12 @@
         <v-icon>mdi-bell</v-icon>
       </v-btn>
     </v-badge> -->
-    <Notifications :key="componentKey" @readNotification="componentKey += 1" />
-    <ChatModal />
+    <Notifications
+      :key="componentKey"
+      @readNotification="componentKey += 1"
+      @openContactsModal="openContactsModal"
+    />
+    <ContactsModal ref="contactsModal" />
 
     <MenuModal />
 
@@ -64,7 +68,7 @@
 
 <script>
 import MenuModal from '../modals/MenuModal';
-import ChatModal from '../modals/ContactsModal';
+import ContactsModal from '../modals/ContactsModal';
 import Notifications from '../modals/Notifications';
 import { mapActions } from 'vuex';
 
@@ -118,7 +122,7 @@ export default {
     },
   },
   components: {
-    ChatModal,
+    ContactsModal,
     MenuModal,
     Notifications,
   },
@@ -131,6 +135,10 @@ export default {
   computed: {},
   methods: {
     ...mapActions(['showNToast']),
+    openContactsModal() {
+      console.log(this.$refs);
+      this.$refs.contactsModal.show();
+    },
   },
   beforeDestroy() {
     this.isMounted = false;

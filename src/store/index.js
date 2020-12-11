@@ -129,6 +129,14 @@ export default new Vuex.Store({
         }
       });
     },
+    clearAllNotifications(state) {
+      state.currentUser.recievedNotifications = [];
+    },
+    markAllAsRead(state) {
+      state.currentUser.recievedNotifications.forEach((notif) => {
+        notif.hasBeenRead = true;
+      });
+    },
     addContactMessage(state, payload) {
       const contact = state.currentUserContacts.find(
         (contact) => contact.id == payload.conversationId
@@ -171,7 +179,14 @@ export default new Vuex.Store({
     },
 
     SOCKET_newLogin(state, message) {
-      console.log(state.currentUserContacts, message);
+      // console.log(message);
+      const user = state.userDirectory.find(
+        (user) => user.uuid == message.uuid
+      );
+      user.isOnline = true;
+      user.lastSeen = message.lastSeen;
+      user.currentSocketId = message.currentSocketId;
+      console.log({ user, message });
       if (state.currentUserContacts) {
         state.currentUserContacts.forEach((contact) => {
           if (contact.inviter.uuid == message.uuid) {
@@ -214,17 +229,26 @@ export default new Vuex.Store({
     },
     SOCKET_userLogout(state, message) {
       // console.log(state.currentUserContacts, message);
+      const user = state.userDirectory.find(
+        (user) => user.uuid == message.uuid
+      );
+      user.isOnline = false;
+      user.lastSeen = message.lastSeen;
+      user.currentSocketId = message.currentSocketId;
+      console.log({ user, message });
       if (state.currentUserContacts) {
         state.currentUserContacts.forEach((contact) => {
           if (contact.inviter.uuid == message.uuid) {
             console.log('Is Inviter', contact.inviter);
             contact.inviter.isOnline = false;
             contact.inviter.lastSeen = message.lastSeen;
+            contact.inviter.currentSocketId = null;
           }
           if (contact.invitee.uuid == message.uuid) {
             console.log('Is Invitee', contact.invitee);
             contact.invitee.isOnline = false;
             contact.invitee.lastSeen = message.lastSeen;
+            contact.invitee.currentSocketId = null;
           }
         });
       }
@@ -360,6 +384,19 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    SOCKET_connected({ state }, message) {
+      if (state.currentUser) {
+        console.log('User is logged in');
+        state.currentUser.currentSocketId = message;
+        this._vm.$socket.emit('login', {
+          user: state.currentUser,
+          socketId: message,
+        });
+      } else {
+        console.log('Not logged In ');
+      }
+      console.log({ state, message });
+    },
     SOCKET_CONNECT({ commit }) {
       console.log('socket disconnected');
       commit('SOCKET_CONNECT');
@@ -403,6 +440,34 @@ export default new Vuex.Store({
       const data = await res.json();
       // console.log({ data, res, commit });
       return data.messages;
+    },
+    async markAllAsRead({ commit, state }) {
+      const res = fetch(`${config.serverURL}/notifications/user/recieved`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${state.currentUser.token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await res.json();
+      if (data.success) {
+        commit('markAllAsRead');
+      }
+    },
+    async clearAllNotifications({ commit, state }) {
+      const res = fetch(`${config.serverURL}/user/recieved`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${state.currentUser.token}`,
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await res.json();
+      if (data.success) {
+        commit('clearAllNotitifications');
+      }
     },
     async setNotificationHasBeenRead({ commit, state }, payload) {
       const updateData = [];
@@ -570,7 +635,7 @@ export default new Vuex.Store({
       const data = await res.json();
       console.log(data, res);
       commit('deleteInvite', payload);
-      // console.log(commit, state, payload);
+
       return { data };
     },
     updateUserContacts({ commit }, payload) {

@@ -434,6 +434,9 @@ export default {
     forceRerender() {
       this.componentKey += 1;
     },
+    show() {
+      this.dialog = true;
+    },
   },
   sockets: {
     // newLogin: function(data) {

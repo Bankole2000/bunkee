@@ -123,6 +123,18 @@ export default {
   methods: {
     ...mapActions(['getSingleListingDetails']),
   },
+  watch: {
+    $route(to, from) {
+      this.getSingleListingDetails({ listinguuid: to.params.uuid }).then(
+        (data) => {
+          if (data.success) {
+            this.listingDetails = data.listing;
+          }
+        }
+      );
+      console.log({ to, from });
+    },
+  },
   beforeMount() {
     console.log(this.$route);
     this.getSingleListingDetails({ listinguuid: this.$route.params.uuid }).then(

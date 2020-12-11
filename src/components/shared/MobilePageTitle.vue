@@ -36,8 +36,12 @@
         <v-icon>mdi-bell</v-icon>
       </v-btn>
     </v-badge> -->
-    <Notifications :key="componentKey" @readNotification="componentKey += 1" />
-    <ChatModal />
+    <Notifications
+      :key="componentKey"
+      @readNotification="componentKey += 1"
+      @openContactsModal="openContactsModal"
+    />
+    <ChatModal ref="contactsModal" />
 
     <MenuModal />
 
@@ -148,6 +152,10 @@ export default {
   },
   methods: {
     ...mapActions(['showNToast']),
+    openContactsModal() {
+      console.log(this.$refs);
+      this.$refs.contactsModal.show();
+    },
   },
   mounted() {
     this.isMounted = true;

@@ -3,6 +3,7 @@
     <v-menu
       :max-height="$vuetify.breakpoint.height / 1.2"
       style="overflow-y: scroll;"
+      v-model="menu"
       bottom
       right
       offset-y
@@ -16,7 +17,9 @@
             :content="
               recievedNotifications.filter((notif) => !notif.hasBeenRead).length
             "
-            :value="recievedNotifications.length"
+            :value="
+              recievedNotifications.filter((notif) => !notif.hasBeenRead).length
+            "
             color="primary"
             overlap
           >
@@ -24,13 +27,39 @@
           </v-badge>
         </v-btn>
       </template>
-      <v-card max-width="320" class="px-0">
+      <v-card max-width="320" class="px-0 rounded-xl">
         <v-toolbar style="width: 100%;" elevation="0">
           <v-toolbar-title>Notifications</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon>
-            <v-icon>mdi-dots-vertical</v-icon>
-          </v-btn>
+          <v-menu transition="slide-x-transition" bottom left :offset-y="true">
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn v-bind="attrs" v-on="on" icon>
+                <v-icon>mdi-dots-horizontal</v-icon>
+              </v-btn>
+            </template>
+
+            <v-list>
+              <v-list-item @click="markAllAsRead()">
+                <v-list-item-icon>
+                  <v-icon>mdi-check-all</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Mark all as read</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <v-list-item @click="clearAllNotifications()">
+                <v-list-item-icon>
+                  <v-icon>mdi-delete</v-icon>
+                </v-list-item-icon>
+                <v-list-item-content>
+                  <v-list-item-title>Clear All Notifications</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
+              <!-- <v-list-item v-for="(item, i) in items" :key="i" @click="">
+          <v-list-item-title>{{ item.title }}</v-list-item-title>
+        </v-list-item> -->
+            </v-list>
+          </v-menu>
         </v-toolbar>
         <v-divider inset></v-divider>
         <v-card-text class="pa-0">
@@ -101,52 +130,12 @@
                   >
                 </v-list-item-icon>
               </v-list-item>
-              <v-list-item
-                v-for="(notif, index) in notifications"
-                :key="index"
-                @click="notifClick($event)"
-                class="pl-0"
-              >
-                <v-badge
-                  overlap
-                  bordered
-                  bottom
-                  :icon="
-                    notif.type == 'chat' ? 'mdi-forum' : 'mdi-home-account'
-                  "
-                  offset-x="25"
-                  offset-y="25"
-                  :color="notif.type == 'chat' ? 'primary' : 'blue'"
-                >
-                  <v-list-item-avatar size="48">
-                    <v-img :src="notif.userAvatar"></v-img>
-                  </v-list-item-avatar>
-                </v-badge>
-                <v-list-item-content>
-                  <v-list-item-subtitle
-                    class="text--primary"
-                    v-if="notif.type == 'chat'"
-                    ><span class="font-weight-bold">{{ notif.from }}</span>
-                    sent you an invitation to chat
-                    <span class="text-subtitle-2 grey--text"
-                      >&middot; {{ notif.time }}</span
-                    >
-                  </v-list-item-subtitle>
-                  <v-list-item-subtitle v-else class="text--primary">
-                    <span class="font-weight-bold">{{ notif.from }}</span>
-                    sent you another thing
-                    <span class="text-subtitle-2 grey--text"
-                      >&middot; {{ notif.time }}</span
-                    >
-                  </v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
             </v-list>
           </div>
         </v-card-text>
         <v-divider></v-divider>
         <v-card-actions>
-          <v-btn block color="primary">
+          <v-btn block color="primary" rounded>
             View All Notifications
           </v-btn>
         </v-card-actions>
@@ -160,89 +149,16 @@ import { mapGetters, mapActions } from 'vuex';
 export default {
   data() {
     return {
-      notifications: [
-        {
-          title: 'Notification 1',
-          type: 'chat',
-          from: '@name321user',
-          time: '3m ago',
-          userAvatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
-        },
-        {
-          title: 'Notification 2',
-          type: 'news',
-          from: '@ladyUser',
-          time: '2d ago',
-          userAvatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
-        },
-        {
-          title: 'Notification 3',
-          type: 'update',
-          from: '@AppName',
-          time: '1w ago',
-          userAvatar: 'https://cdn.vuetifyjs.com/images/logos/v.png',
-        },
-        {
-          title: 'Notification 4',
-          type: 'listing',
-          from: '@name321user',
-          time: '24 Aug',
-          userAvatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
-        },
-        // {
-        //   title: 'Notification 1',
-        //   type: 'chat',
-        //   from: '@name321user',
-        //   time: '3m ago',
-        //   userAvatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg'
-        // },
-        // {
-        //   title: 'Notification 2',
-        //   type: 'news',
-        //   from: '@ladyUser',
-        //   time: '2d ago',
-        //   userAvatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg'
-        // },
-        // {
-        //   title: 'Notification 3',
-        //   type: 'update',
-        //   from: '@AppName',
-        //   time: '1w ago',
-        //   userAvatar: 'https://cdn.vuetifyjs.com/images/logos/v.png'
-        // },
-        // {
-        //   title: 'Notification 4',
-        //   type: 'listing',
-        //   from: '@name321user',
-        //   time: '24 Aug',
-        //   userAvatar: 'https://cdn.vuetifyjs.com/images/lists/4.jpg'
-        // },
-        // {
-        //   title: 'Notification 1',
-        //   type: 'chat',
-        //   from: '@name321user',
-        //   time: '3m ago',
-        //   userAvatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg'
-        // },
-        // {
-        //   title: 'Notification 2',
-        //   type: 'news',
-        //   from: '@ladyUser',
-        //   time: '2d ago',
-        //   userAvatar: 'https://cdn.vuetifyjs.com/images/lists/3.jpg'
-        // },
-        // {
-        //   title: 'Notification 3',
-        //   type: 'update',
-        //   from: '@AppName',
-        //   time: '1w ago',
-        //   userAvatar: 'https://cdn.vuetifyjs.com/images/logos/v.png'
-        // }
-      ],
+      menu: false,
     };
   },
   methods: {
-    ...mapActions(['setNotificationHasBeenRead']),
+    ...mapActions([
+      'setNotificationHasBeenRead',
+      'markAllAsRead',
+      'clearAllNotifications',
+    ]),
+
     handleNotif(notification) {
       if (!notification.hasBeenRead) {
         this.setNotificationHasBeenRead({
@@ -253,7 +169,13 @@ export default {
         });
       }
       if (notification.notificationType == 'listingInvite') {
-        this.$router.push(notification.notificationUrl);
+        this.$router.push(notification.notificationUrl).then(() => {
+          this.menu = false;
+        });
+      }
+      if (notification.notificationType == 'chatInvite') {
+        this.$emit('openContactsModal');
+        this.menu = false;
       }
       // console.log(notification);
     },

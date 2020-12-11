@@ -37,13 +37,17 @@
       >
 
       <v-spacer v-if="$vuetify.breakpoint.mdAndUp"></v-spacer>
-      <Notifications />
+      <Notifications
+        :key="componentKey"
+        @readNotification="componentKey += 1"
+        @openContactsModal="openContactsModal"
+      />
       <OldChatModal />
       <v-btn text class="text-capitalize" v-if="$vuetify.breakpoint.mdAndUp"
         >Become A Host</v-btn
       >
 
-      <ContactModal />
+      <ContactModal ref="contactsModal" />
       <v-btn
         v-if="$route.path != '/login' && $route.path != '/signup'"
         icon
@@ -151,7 +155,7 @@
               <v-list-item-subtitle>Rent a Place</v-list-item-subtitle>
             </v-list-item>
             <v-divider></v-divider>
-            <v-list-item @click="() => {}">
+            <v-list-item @click="showLargeSnackbar">
               <v-list-item-action>
                 <v-icon>mdi-image-filter-hdr</v-icon>
               </v-list-item-action>
@@ -201,6 +205,10 @@
       :show="showSignupModal"
       @closeModal="showSignupModal = false"
     />
+    <audio
+      ref="newNotification"
+      :src="require('@/assets/audio/newNotification.mp3')"
+    ></audio>
   </div>
 </template>
 
@@ -220,20 +228,73 @@ export default {
     ContactModal,
     Notifications,
   },
+  sockets: {
+    recievedListingInvite: function(data) {
+      if (this.isMounted) {
+        this.componentKey += 1;
+        console.log(data);
+        if (this.$refs.newNotification) {
+          this.$refs.newNotification.volume = 0.3;
+          this.$refs.newNotification.play();
+        }
+        this.showNToast({
+          nclass: `${data.data.notification.notificationType}`,
+          message: data.data.notification.notificationText,
+          sender: data.data.notification.sender.username,
+          imgUrl: data.data.notification.sender.profileImageUrl,
+        });
+      }
+    },
+    recievedChatInvite: function(data) {
+      if (this.isMounted) {
+        this.componentKey += 1;
+        console.log(data);
+        this.$refs.newNotification.volume = 0.3;
+        this.$refs.newNotification.play();
+        this.showNToast({
+          nclass: `${data.data.notification.notificationType}`,
+          message: data.data.notification.notificationText,
+          sender: data.data.notification.sender.username,
+          imgUrl: data.data.notification.sender.profileImageUrl,
+        });
+      }
+    },
+    inviteResponse: function(data) {
+      if (this.isMounted) {
+        console.log(data);
+        this.componentKey += 1;
+        this.$refs.newNotification.volume = 0.3;
+        this.$refs.newNotification.play();
+        this.showNToast({
+          nclass: `${data.data.notification.notificationType}`,
+          message: data.data.notification.notificationText,
+          sender: data.data.notification.sender.username,
+          imgUrl: data.data.notification.sender.profileImageUrl,
+        });
+      }
+      // this.showNToast({ntclass: "chat", message: 'Sent you a Chat invite', })
+    },
+  },
   data() {
     return {
       config,
       searching: false,
+      isMounted: false,
       userMenu: false,
       showLoginModal: false,
       showSignupModal: false,
+      componentKey: 0,
     };
   },
   computed: {
     ...mapGetters(['loggedInUser']),
   },
   methods: {
-    ...mapActions(['logOut', 'showToast']),
+    ...mapActions(['logOut', 'showToast', 'showNToast']),
+    showLargeSnackbar() {
+      console.log('show Large Snackbar');
+      this.showNToast({ message: 'testing testing', timeout: 2000 });
+    },
     logout() {
       this.$socket.emit('logout', this.loggedInUser);
       this.logOut();
@@ -242,6 +303,16 @@ export default {
         message: 'Logged Out',
       });
     },
+    openContactsModal() {
+      console.log(this.$refs);
+      this.$refs.contactsModal.show();
+    },
+  },
+  beforeMount() {
+    this.isMounted = true;
+  },
+  beforeDestroy() {
+    this.isMounted = false;
   },
   mounted() {
     console.log(this.$route);
